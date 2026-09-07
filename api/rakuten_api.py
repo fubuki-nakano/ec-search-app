@@ -3,6 +3,7 @@ import requests
 from dotenv import load_dotenv
 
 load_dotenv()
+# Appキー・アクセスキー呼び出し
 application_id = os.getenv("RAKUTEN_APPLICATION_ID")
 access_key = os.getenv("RAKUTEN_ACCESS_KEY")
 
@@ -26,7 +27,7 @@ def search_rakuten(keyword):
 # 返ってきた結果をresponseに入れる
     response = requests.get(url, params=params)
 # 返答確認
-    print(response.status_code)
+    # print(response.status_code)
 # 帰ってきたJsonをdataにセット
     data = response.json()
 
