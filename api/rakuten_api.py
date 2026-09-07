@@ -38,7 +38,7 @@ def search_rakuten(keyword):
 # print(item["itemUrl"])
 
 # return用の箱
-    results = []
+    rakuten_results = []
 
 # for文で5件目まで表示
     for i,itemList in enumerate(data["Items"]):
@@ -51,12 +51,13 @@ def search_rakuten(keyword):
         product = {
         "name": item["itemName"],
         "price": item["itemPrice"],
-        "url": item["itemUrl"]
+        "url": item["itemUrl"],
+        "image": item["mediumImageUrls"][0]["imageUrl"]
         }
 
-        results.append(product)
+        rakuten_results.append(product)
 
-    return results
+    return rakuten_results
 
 # 商品情報受け渡しテスト用
 # test = search_rakuten("iPhone")
