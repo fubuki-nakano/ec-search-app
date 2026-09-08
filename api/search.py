@@ -2,15 +2,17 @@
 import requests
 from api.rakuten_api import search_rakuten
 from api.yahoo_search import search_yahoo
+from api.google_shopping import search_serp
 
 # 表示時のサイト別表示対応表
 SITES = {
     "rakuten": {"name": "楽天市場", "search": search_rakuten},
     "yahoo": {"name": "Yahoo!ショッピング", "search": search_yahoo},
+    "serp": {"name": "Google Shopping", "search": search_serp},
 }
 
 # app.pyから渡された情報の受け取り
-def search_products(keyword, selected_sites, limit, sort):
+def search_products(keyword, selected_sites, limit, sort, min_price=None, max_price=None):
     # 商品結果とエラーを入れる空リスト
     products, errors = [], []
     # これは選択されたサイトを順番に処理
@@ -20,7 +22,9 @@ def search_products(keyword, selected_sites, limit, sort):
         site = SITES[site_id]
         try:
             # API検索
-            results = site["search"](keyword, limit=limit, sort=sort)
+            results = site["search"](keyword, 
+            limit=limit, sort=sort,min_price=min_price,
+            max_price=max_price,)
             # APIの検索結果にサイト名を追加して表示
             products.extend({**product, "site": site["name"]} for product in results)
             # APIへの通信失敗等でもアプリが停止しない処理

@@ -9,7 +9,7 @@ client_id = os.getenv("YAHOO_CLIENT_ID")
 url = "https://shopping.yahooapis.jp/ShoppingWebService/V3/itemSearch"
 
 # 検索用の関数
-def search_yahoo(keyword, limit=5, sort="price_asc"):
+def search_yahoo(keyword, limit=5, sort="price_asc", min_price=None, max_price=None):
     """Yahoo!の商品を既存の共通形式に変換して返す。"""
     if not client_id:
         raise ValueError("Yahoo!のAPIキーが未設定です。")
@@ -20,6 +20,11 @@ def search_yahoo(keyword, limit=5, sort="price_asc"):
         "results": limit,
         "sort": {"price_asc": "+price", "price_desc": "-price"}[sort],
     }
+    # 価格の上限下限を指定
+    if min_price is not None:
+        params["price_from"] = min_price
+    if max_price is not None:
+        params["price_to"] = max_price
     # APIと通信
     response = requests.get(url, params=params, timeout=15)
     # HTTPのエラー確認

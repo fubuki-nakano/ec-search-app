@@ -12,6 +12,7 @@
 <body>
 <main>
   <h1>商品比較検索</h1>
+  <!-- getでapp.pyへ -->
   <form method="get" action="/">
     <fieldset>
       <legend>検索対象サイト（複数選択可）</legend>
@@ -23,6 +24,41 @@
     </fieldset>
     <label for="keyword">商品名</label>
     <input id="keyword" name="keyword" type="search" value="{{ keyword }}" maxlength="128" required placeholder="例：イヤホン">
+<!--最低価格の指定-->
+    <label for="min_price">最低価格</label>
+  <input
+    id="min_price"
+    name="min_price"
+    type="number"
+    min="0"
+    value="{{ min_price_text }}"
+    list="price_options"
+    placeholder="指定なし"
+  >
+
+  <span>〜</span>
+<!-- 最高価格の指定 -->
+  <label for="max_price">最高価格</label>
+  <input
+    id="max_price"
+    name="max_price"
+    type="number"
+    min="0"
+    value="{{ max_price_text }}"
+    list="price_options"
+    placeholder="指定なし"
+  >
+
+  <datalist id="price_options">
+    <option value="5000">
+    <option value="10000">
+    <option value="20000">
+    <option value="30000">
+    <option value="50000">
+    <option value="100000">
+    <option value="200000">
+    <option value="500000">
+  </datalist>
     <label for="limit">表示件数（全サイト合計）</label>
     <select id="limit" name="limit">
       {% for value in limits %}

@@ -10,7 +10,7 @@ access_key = os.getenv("RAKUTEN_ACCESS_KEY")
 url = "https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20260701"
 
 # 検索用の関数
-def search_rakuten(keyword, limit=5, sort="price_asc"):
+def search_rakuten(keyword, limit=5, sort="price_asc", min_price=None, max_price=None):
     """楽天の商品を既存の共通形式に変換して返す。"""
     if not application_id or not access_key:
         # APIキーが取得できていないときの処理
@@ -25,6 +25,11 @@ def search_rakuten(keyword, limit=5, sort="price_asc"):
         # ここで価格順に直すためにAPIから帰ってきた情報を変換
         "sort": {"price_asc": "+itemPrice", "price_desc": "-itemPrice"}[sort],
     }
+    # 価格の上限下限を指定
+    if min_price is not None:
+        params["minPrice"] = min_price
+    if max_price is not None:
+        params["maxPrice"] = max_price
     # 楽天APIへ問い合わせ
     response = requests.get(url, params=params, timeout=15)
     # エラーが返ってきたら例外にする
