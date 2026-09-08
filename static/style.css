@@ -1,0 +1,32 @@
+/* ページ全体 */
+body { font-family: sans-serif; color: #222; background: #fafafa; margin: 0; }
+/* 画面全体を中央に */
+main { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
+/* 検索フォーム */
+form { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 16px; background: white; border: 1px solid #ccc; }
+/* 選択部分だけ横幅100% */
+fieldset { flex-basis: 100%; }
+/* 選択部分だけ横幅100% */
+fieldset label { display: inline-block; margin: 8px; }
+/* 検索窓、選択欄、ボタン全部に共通設定 */
+input, select, button { font: inherit; padding: 8px; }
+/* 検索ボタンにマウスを乗せた時、カーソルを指の形に */
+button { cursor: pointer; }
+/* エラー文用。文字を赤系、背景を薄い赤 */
+.error { color: #9b2020; background: #fff0f0; padding: 12px; }
+/* ページ全体を崩さずに表部分だけ横スクロール */
+.table-wrap { overflow-x: auto; }
+/* 表の横幅・セル同士の枠線・表の背景*/
+table { width: 100%; border-collapse: collapse; background: white; }
+/* 表の見出しとデータ部分 */
+th, td { text-align: left; padding: 12px; border: 1px solid #ccc; }
+/* 長い文字列を途中で折り返す */
+td { overflow-wrap: anywhere; }
+/* 商品ページURLの横幅を制限 */
+td:last-child { max-width: 240px; }
+/* 商品画像を枠の中に収める */
+img { object-fit: contain; }
+/* 価格を途中で改行させない */
+.price { white-space: nowrap; }
+/* 楽天・Yahoo!のAPIリンク部分 */
+footer { margin-top: 24px; font-size: 0.85rem; }

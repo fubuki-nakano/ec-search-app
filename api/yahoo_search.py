@@ -2,46 +2,38 @@ import os
 import requests
 from dotenv import load_dotenv
 
+# # API情報(キー)の取得(env)
 load_dotenv()
-
-# クライアントキー呼び出し
 client_id = os.getenv("YAHOO_CLIENT_ID")
-# リクエストURL
+# # APIの接続先
 url = "https://shopping.yahooapis.jp/ShoppingWebService/V3/itemSearch"
 
-
-def search_yahoo(keyword):
-
+# 検索用の関数
+def search_yahoo(keyword, limit=5, sort="price_asc"):
+    """Yahoo!の商品を既存の共通形式に変換して返す。"""
+    if not client_id:
+        raise ValueError("Yahoo!のAPIキーが未設定です。")
+    # APIに送る検索条件
     params = {
         "appid": client_id,
         "query": keyword,
-        "results": 5
+        "results": limit,
+        "sort": {"price_asc": "+price", "price_desc": "-price"}[sort],
     }
-
-# paramsの条件を付けてGETリクエストを送って、
-# 返ってきた結果をresponseに入れる
-    response = requests.get(url, params=params)
-
-# 帰ってきたJsonをdataにセット
+    # APIと通信
+    response = requests.get(url, params=params, timeout=15)
+    # HTTPのエラー確認
+    response.raise_for_status()
+    # JSONをPython用のデータに
     data = response.json()
-
-# ↓APIから帰ってきたデータの０番目(1番目)のデータを表示させる(テスト用)
-# item = data["hits"][0]
-# print(item["name"])
-# print(item["price"])
-# print(item["url"])
-
-# app.py転送用のリスト
+    # 結果を入れる空リスト
     yahoo_results = []
-
-# 帰ってきたデータをfor文で表示(回数はparamで指定済み)
+    # 共通の表示形式に変換
     for item in data["hits"]:
         yahoo_results.append({
             "name": item["name"],
-            "price": item["price"],
+            "price": int(item["price"]),
             "url": item["url"],
-            "image": item["image"]["medium"]
-            })
-
+            "image": (item.get("image") or {}).get("medium", ""),
+        })
     return yahoo_results
-

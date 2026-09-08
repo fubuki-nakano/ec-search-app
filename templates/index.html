@@ -1,0 +1,80 @@
+<!doctype html>
+<!--日本語指定-->
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+<!--画面表示設定-->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>商品比較検索</title>
+<!--CSS読み込み-->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<main>
+  <h1>商品比較検索</h1>
+  <form method="get" action="/">
+    <fieldset>
+      <legend>検索対象サイト（複数選択可）</legend>
+      <!--app.py から渡された sites を順番に処理-->
+      {% for id, site in sites.items() %}
+      <!--サイト指定チェックボックス-->
+      <label><input type="checkbox" name="sites" value="{{ id }}" {% if id in selected %}checked{% endif %}> {{ site.name }}</label>
+      {% endfor %}
+    </fieldset>
+    <label for="keyword">商品名</label>
+    <input id="keyword" name="keyword" type="search" value="{{ keyword }}" maxlength="128" required placeholder="例：イヤホン">
+    <label for="limit">表示件数（全サイト合計）</label>
+    <select id="limit" name="limit">
+      {% for value in limits %}
+      <option value="{{ value }}" {% if value|string == limit %}selected{% endif %}>{{ value }}件</option>
+      {% endfor %}
+    </select>
+    <label for="sort">並び順</label>
+    <select id="sort" name="sort">
+      {% for value, label in sorts.items() %}
+      <option value="{{ value }}" {% if value == sort %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">検索</button>
+  </form>
+  <!--エラー発生時の表示-->
+  {% for error in errors %}<p class="error" role="alert">{{ error }}</p>{% endfor %}
+  <!--検索した後かどうか-->
+  {% if searched %}
+  <!--件数を表示-->
+  <h2>検索結果：{{ products|length }}件</h2>
+  <!--商品があれば表を表示-->
+  {% if products %}
+  <p>商品価格で比較しています。送料・ポイントは含みません。最新の価格は商品ページで確認してください。</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th scope="col">画像</th><th scope="col">商品名</th><th scope="col">価格</th><th scope="col">サイト</th><th scope="col">商品ページURL</th></tr></thead>
+      <tbody>
+        <!--商品を1件ずつ表示-->
+      {% for product in products %}
+      <tr>
+        <!-- 画像URLがちゃんとHTTP形式なら画像を表示 -->
+        <td>{% if product.image.startswith(('https://', 'http://')) %}<img src="{{ product.image }}" alt="{{ product.name }}" loading="lazy" width="100" height="100">{% else %}画像なし{% endif %}</td>
+        <!-- 商品名 -->
+        <td>{{ product.name }}</td>
+        <!-- 価格 -->
+        <td class="price">¥{{ "{:,}".format(product.price) }}</td>
+        <!-- サイト名 -->
+        <td>{{ product.site }}</td>
+        <!-- 商品URL -->
+        <td>{% if product.url.startswith(('https://', 'http://')) %}<a href="{{ product.url }}" target="_blank" rel="noopener noreferrer">{{ product.url }}</a>{% else %}URLなし{% endif %}</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <!-- エラー以外で検索結果が０の時 -->
+  {% elif not errors %}<p>該当する商品がありません。商品名を変えて検索してください。</p>{% endif %}
+  {% else %}<p>サイトを選び、商品名を入力して検索してください。</p>{% endif %}
+  <footer>
+    <a href="https://webservice.rakuten.co.jp/">Supported by 楽天ウェブサービス</a>
+    / <a href="https://developer.yahoo.co.jp/sitemap/">Webサービス by Yahoo! JAPAN</a>
+  </footer>
+</main>
+</body>
+</html>
