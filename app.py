@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 from api.search import SITES, search_products
-from db import init_db, save_results, count_results, get_results_page
+from db import init_db, save_results, count_results, get_results_page, clear_results
 import uuid
 
 # アプリ開始
@@ -10,7 +10,7 @@ init_db()
 # 表示件数
 LIMITS = (5, 10, 20, 30)
 # 各APIから取得する件数
-FETCH_LIMIT = 30
+FETCH_LIMIT = 50
 # 価格順の指定
 SORTS = {"price_asc": "価格の安い順", "price_desc": "価格の高い順"}
 
@@ -26,7 +26,6 @@ def index():
     search_id = request.args.get("search_id", "").strip()
     # 取得するサイトのチェックボックス
     selected = request.args.getlist("sites") if searched else list(SITES)
-    # 表示件数・昇順降順の初期値
     # 表示件数・ページ番号・昇順降順の初期値
     limit = request.args.get("limit", "10")
     page_text = request.args.get("page", "1")
@@ -70,6 +69,8 @@ def index():
         if not errors:
             # search_idがない場合は新しい検索
             if not search_id:
+                # 新しい検索の前に古い検索結果を削除
+                clear_results()
                 products, errors = search_products(
                     keyword,
                     selected,
@@ -79,9 +80,9 @@ def index():
                     max_price=max_price,
                 )
                 # APIから商品を取得できたら検索IDを作ってDBに保存
-            if products:
-                search_id = uuid.uuid4().hex
-                save_results(search_id, products)
+                if products:
+                    search_id = uuid.uuid4().hex
+                    save_results(search_id, products)
             # 1ページに表示する件数
             page_size = int(limit)
             # DBに保存されている検索結果の総件数

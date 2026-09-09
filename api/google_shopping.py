@@ -16,12 +16,12 @@ def search_serp(keyword, limit=5, sort="price_asc", min_price=None, max_price=No
         raise ValueError("SerpAPIキーが未設定です")
     # APIに送る検索条件
     params = {
-    "engine": "google_shopping",
-    "q": keyword,
-    "gl": "jp",
-    "hl": "ja",
-    "api_key": serp_api,
-    "sort_by": {"price_asc": 1, "price_desc": 2}[sort],
+        "engine": "google_shopping",
+        "q": keyword,
+        "gl": "jp",
+        "hl": "ja",
+        "api_key": serp_api,
+        "sort_by": {"price_asc": 1, "price_desc": 2}[sort],
     }
     # 価格の上限下限を決める
     if min_price is not None:
@@ -39,9 +39,10 @@ def search_serp(keyword, limit=5, sort="price_asc", min_price=None, max_price=No
     # 共通の表示形式に変換
     for item in data.get("shopping_results", []):
         serp_results.append({
-        "name": item.get("title", ""),
-        "price": int(item["extracted_price"]),
-        "url": item.get("product_link", item.get("link", "")),
-        "image": item.get("thumbnail", ""),
+            "name": item.get("title", ""),
+            "price": int(item["extracted_price"]),
+            "url": item.get("product_link", item.get("link", "")),
+            "image": item.get("thumbnail", ""),
         })
+    # 指定された件数だけ search.py に返す
     return serp_results[:limit]

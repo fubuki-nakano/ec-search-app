@@ -84,21 +84,47 @@
   <p>商品価格で比較しています。送料・ポイントは含みません。最新の価格は商品ページで確認してください。</p>
   <div class="table-wrap">
     <table>
-      <thead><tr><th scope="col">画像</th><th scope="col">商品名</th><th scope="col">価格</th><th scope="col">サイト</th><th scope="col">商品ページURL</th></tr></thead>
+      <thead><tr><th scope="col">画像</th><th scope="col">商品名</th><th scope="col">価格</th><th scope="col">サイト</th></tr></thead>
       <tbody>
         <!--商品を1件ずつ表示-->
       {% for product in products %}
       <tr>
-        <!-- 画像URLがちゃんとHTTP形式なら画像を表示 -->
-        <td>{% if product.image.startswith(('https://', 'http://')) %}<img src="{{ product.image }}" alt="{{ product.name }}" loading="lazy" width="100" height="100">{% else %}画像なし{% endif %}</td>
+        <!-- 商品画像と商品ページへのリンク -->
+<td>
+  {% if product.image.startswith(('https://', 'http://')) %}
+    {% if product.url.startswith(('https://', 'http://')) %}
+      <a class="product-link" href="{{ product.url }}" target="_blank" rel="noopener noreferrer">
+        <img
+          src="{{ product.image }}"
+          alt="{{ product.name }}"
+          loading="lazy"
+          width="100"
+          height="100"
+        >
+        <br>
+        商品ページへ
+      </a>
+    {% else %}
+      <img
+        src="{{ product.image }}"
+        alt="{{ product.name }}"
+        loading="lazy"
+        width="100"
+        height="100"
+      >
+    {% endif %}
+  {% else %}
+    画像なし
+  {% endif %}
+</td>
         <!-- 商品名 -->
         <td>{{ product.name }}</td>
         <!-- 価格 -->
         <td class="price">¥{{ "{:,}".format(product.price) }}</td>
         <!-- サイト名 -->
         <td>{{ product.site }}</td>
-        <!-- 商品URL -->
-        <td>{% if product.url.startswith(('https://', 'http://')) %}<a href="{{ product.url }}" target="_blank" rel="noopener noreferrer">{{ product.url }}</a>{% else %}URLなし{% endif %}</td>
+
+
       </tr>
       {% endfor %}
       </tbody>
@@ -117,9 +143,11 @@
       sort=sort,
       min_price=min_price_text,
       max_price=max_price_text,
+      search_id=search_id,
       page=page - 1
     ) }}">← 前へ</a>
     {% endif %}
+
   <!-- ページ番号 -->
   {% for p in range(1, total_pages + 1) %}
     {% if p == page %}
@@ -148,6 +176,7 @@
       sort=sort,
       min_price=min_price_text,
       max_price=max_price_text,
+      search_id=search_id,
       page=page + 1
     ) }}">次へ →</a>
     {% endif %}

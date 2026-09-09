@@ -2,10 +2,10 @@ import os
 import requests
 from dotenv import load_dotenv
 
-# # API情報(キー)の取得(env)
+# API情報(キー)の取得(env)
 load_dotenv()
 client_id = os.getenv("YAHOO_CLIENT_ID")
-# # APIの接続先
+# APIの接続先
 url = "https://shopping.yahooapis.jp/ShoppingWebService/V3/itemSearch"
 
 # 検索用の関数
@@ -41,4 +41,5 @@ def search_yahoo(keyword, limit=5, sort="price_asc", min_price=None, max_price=N
             "url": item["url"],
             "image": (item.get("image") or {}).get("medium", ""),
         })
+    # 商品一覧を search.py に返す
     return yahoo_results

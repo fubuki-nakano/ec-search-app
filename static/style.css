@@ -51,3 +51,11 @@ margin: 24px 0;
 .pagination a,
 .current-page {padding: 8px 12px;}
 .current-page {font-weight: bold;border: 1px solid #999;}
+/* URLリンク用 */
+.product-link {
+text-decoration: none;
+}
+/* リンクホバー時の挙動 */
+.product-link:hover {
+text-decoration: underline;
+}

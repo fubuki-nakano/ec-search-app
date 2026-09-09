@@ -6,9 +6,21 @@ from api.google_shopping import search_serp
 
 # 表示時のサイト別表示対応表
 SITES = {
-    "rakuten": {"name": "楽天市場", "search": search_rakuten},
-    "yahoo": {"name": "Yahoo!ショッピング", "search": search_yahoo},
-    "serp": {"name": "Google Shopping", "search": search_serp},
+    "rakuten": {
+        "name": "楽天市場",
+        "search": search_rakuten, 
+        "max_limit": 30,
+        },
+    "yahoo": {
+        "name": "Yahoo!ショッピング",
+        "search": search_yahoo,
+        "max_limit": 50,
+        },
+    "serp": {
+        "name": "Google Shopping",
+        "search": search_serp,
+        "max_limit": 30,
+        },
 }
 
 # app.pyから渡された情報の受け取り
@@ -21,9 +33,11 @@ def search_products(keyword, selected_sites, fetch_limit, sort, min_price=None, 
         # 選択されたサイトに合わせてSITESから表示形式を呼び出す
         site = SITES[site_id]
         try:
+            # サイトごとの上限を決める
+            site_limit = min(fetch_limit, site["max_limit"])
             # API検索
             results = site["search"](keyword, 
-            limit=fetch_limit, sort=sort,min_price=min_price,
+            limit=site_limit, sort=sort,min_price=min_price,
             max_price=max_price,)
             # APIの検索結果にサイト名を追加して表示
             products.extend({**product, "site": site["name"]} for product in results)

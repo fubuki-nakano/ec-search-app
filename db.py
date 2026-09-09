@@ -98,6 +98,13 @@ def get_results_page(search_id, page, page_size, sort="price_asc"):
 
     return [dict(row) for row in rows]
 
+# 古い検索結果をすべて削除
+def clear_results():
+    with get_connection() as conn:
+        conn.execute("""
+            DELETE FROM search_results
+        """)
+
 # データベース作成命令
 if __name__ == "__main__":
     init_db()

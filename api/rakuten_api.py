@@ -15,7 +15,7 @@ def search_rakuten(keyword, limit=5, sort="price_asc", min_price=None, max_price
     if not application_id or not access_key:
         # APIキーが取得できていないときの処理
         raise ValueError("楽天のAPIキーが未設定です。")
-        # APIに送る条件表
+    # APIに送る条件表
     params = {
         "applicationId": application_id,
         "accessKey": access_key,
