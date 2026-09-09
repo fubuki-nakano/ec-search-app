@@ -1,10 +1,16 @@
 from flask import Flask, render_template, request
 from api.search import SITES, search_products
+from db import init_db, save_results, count_results, get_results_page
+import uuid
 
 # アプリ開始
 app = Flask(__name__)
+# データベースを準備
+init_db()
 # 表示件数
 LIMITS = (5, 10, 20, 30)
+# 各APIから取得する件数
+FETCH_LIMIT = 30
 # 価格順の指定
 SORTS = {"price_asc": "価格の安い順", "price_desc": "価格の高い順"}
 
@@ -16,10 +22,15 @@ def index():
     searched = bool(request.args)
     # 検索窓の商品名を取得、.strip()前後の余計な空白を消す
     keyword = request.args.get("keyword", "").strip()
+    # どの検索結果なのかを識別するIDを取得
+    search_id = request.args.get("search_id", "").strip()
     # 取得するサイトのチェックボックス
     selected = request.args.getlist("sites") if searched else list(SITES)
     # 表示件数・昇順降順の初期値
+    # 表示件数・ページ番号・昇順降順の初期値
     limit = request.args.get("limit", "10")
+    page_text = request.args.get("page", "1")
+    page = int(page_text) if page_text.isdigit() and int(page_text) >= 1 else 1
     sort = request.args.get("sort", "price_asc")
     # 価格上限下限の設定
     min_price_text = request.args.get("min_price", "").strip()
@@ -28,6 +39,8 @@ def index():
     max_price = int(max_price_text) if max_price_text.isdigit() else None
     # 検索時、未入力(エラー)か検索結果が入るからのリスト
     products, errors = [], []
+    total_products = 0
+    total_pages = 0
 
     # 検索をされたときに動くメイン部分
     if searched:
@@ -55,17 +68,40 @@ def index():
         # ↑までにエラーが出ていなければ↓が実行される
         # ここまでの指定されたものをAPIに渡す
         if not errors:
-            products, errors = search_products(
-                keyword,
-                selected,
-                int(limit),
+            # search_idがない場合は新しい検索
+            if not search_id:
+                products, errors = search_products(
+                    keyword,
+                    selected,
+                    FETCH_LIMIT,
+                    sort,
+                    min_price=min_price,
+                    max_price=max_price,
+                )
+                # APIから商品を取得できたら検索IDを作ってDBに保存
+            if products:
+                search_id = uuid.uuid4().hex
+                save_results(search_id, products)
+            # 1ページに表示する件数
+            page_size = int(limit)
+            # DBに保存されている検索結果の総件数
+            total_products = count_results(search_id)
+            # 総ページ数
+            total_pages = (total_products + page_size - 1) // page_size
+            # ページ番号が最大ページを超えていたら最後のページにする
+            if total_pages > 0 and page > total_pages:
+                page = total_pages
+            # 現在のページ分だけDBから取得
+            products = get_results_page(
+                search_id,
+                page,
+                page_size,
                 sort,
-                min_price=min_price,
-                max_price=max_price,
             )
     # APIから帰ってきた情報をHTMLへ渡す
     return render_template(
-        "index.html", sites=SITES,
+        "index.html",
+        sites=SITES,
         limits=LIMITS,
         sorts=SORTS,
         keyword=keyword,
@@ -77,6 +113,10 @@ def index():
         products=products,
         errors=errors,
         searched=searched,
+        page=page,
+        total_pages=total_pages,
+        total_products=total_products,
+        search_id=search_id,
     )
 
 # python app.pyが実行されたときにapp.run()が動いて

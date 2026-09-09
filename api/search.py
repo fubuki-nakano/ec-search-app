@@ -12,7 +12,7 @@ SITES = {
 }
 
 # app.pyから渡された情報の受け取り
-def search_products(keyword, selected_sites, limit, sort, min_price=None, max_price=None):
+def search_products(keyword, selected_sites, fetch_limit, sort, min_price=None, max_price=None):
     # 商品結果とエラーを入れる空リスト
     products, errors = [], []
     # これは選択されたサイトを順番に処理
@@ -23,7 +23,7 @@ def search_products(keyword, selected_sites, limit, sort, min_price=None, max_pr
         try:
             # API検索
             results = site["search"](keyword, 
-            limit=limit, sort=sort,min_price=min_price,
+            limit=fetch_limit, sort=sort,min_price=min_price,
             max_price=max_price,)
             # APIの検索結果にサイト名を追加して表示
             products.extend({**product, "site": site["name"]} for product in results)
@@ -36,5 +36,5 @@ def search_products(keyword, selected_sites, limit, sort, min_price=None, max_pr
             )
     # APIから帰ってきた情報をまとめて価格順に並べる
     products.sort(key=lambda product: product["price"], reverse=sort == "price_desc")
-    # 合計の表示件数の制限(指定件数だけ表示)
-    return products[:limit], errors
+    # 価格順に並べた検索結果をすべてapp.pyへ返す
+    return products, errors

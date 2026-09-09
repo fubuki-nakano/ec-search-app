@@ -59,7 +59,7 @@
     <option value="200000">
     <option value="500000">
   </datalist>
-    <label for="limit">表示件数（全サイト合計）</label>
+    <label for="limit">1ページの表示件数</label>
     <select id="limit" name="limit">
       {% for value in limits %}
       <option value="{{ value }}" {% if value|string == limit %}selected{% endif %}>{{ value }}件</option>
@@ -78,7 +78,7 @@
   <!--検索した後かどうか-->
   {% if searched %}
   <!--件数を表示-->
-  <h2>検索結果：{{ products|length }}件</h2>
+  <h2>検索結果：全{{ total_products }}件</h2>
   <!--商品があれば表を表示-->
   {% if products %}
   <p>商品価格で比較しています。送料・ポイントは含みません。最新の価格は商品ページで確認してください。</p>
@@ -104,6 +104,56 @@
       </tbody>
     </table>
   </div>
+    <!-- ページ移動 -->
+  {% if total_pages > 1 %}
+  <nav class="pagination">
+
+    {% if page > 1 %}
+    <a href="{{ url_for(
+      'index',
+      keyword=keyword,
+      sites=selected,
+      limit=limit,
+      sort=sort,
+      min_price=min_price_text,
+      max_price=max_price_text,
+      page=page - 1
+    ) }}">← 前へ</a>
+    {% endif %}
+  <!-- ページ番号 -->
+  {% for p in range(1, total_pages + 1) %}
+    {% if p == page %}
+    <span>{{ page }} / {{ total_pages }}ページ</span>
+    {% else %}
+      <a href="{{ url_for(
+        'index',
+        keyword=keyword,
+        sites=selected,
+        limit=limit,
+        sort=sort,
+        min_price=min_price_text,
+        max_price=max_price_text,
+        search_id=search_id,
+        page=p
+      ) }}">{{ p }}</a>
+    {% endif %}
+  {% endfor %}
+
+    {% if page < total_pages %}
+    <a href="{{ url_for(
+      'index',
+      keyword=keyword,
+      sites=selected,
+      limit=limit,
+      sort=sort,
+      min_price=min_price_text,
+      max_price=max_price_text,
+      page=page + 1
+    ) }}">次へ →</a>
+    {% endif %}
+
+  </nav>
+  {% endif %}
   <!-- エラー以外で検索結果が０の時 -->
   {% elif not errors %}<p>該当する商品がありません。商品名を変えて検索してください。</p>{% endif %}
   {% else %}<p>サイトを選び、商品名を入力して検索してください。</p>{% endif %}

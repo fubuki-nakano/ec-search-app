@@ -30,3 +30,24 @@ img { object-fit: contain; }
 .price { white-space: nowrap; }
 /* 楽天・Yahoo!のAPIリンク部分 */
 footer { margin-top: 24px; font-size: 0.85rem; }
+/* ページ切り替え表記 */
+.pagination {
+display: flex;
+justify-content: center;
+align-items: center;
+gap: 20px;
+margin: 24px 0;
+}
+/* 次へ・前への部分 */
+.pagination a {padding: 8px 12px;}
+/* ページ指定ボタン */
+.pagination {
+display: flex;
+justify-content: center;
+align-items: center;
+gap: 12px;
+margin: 24px 0;
+}
+.pagination a,
+.current-page {padding: 8px 12px;}
+.current-page {font-weight: bold;border: 1px solid #999;}
