@@ -9,17 +9,17 @@ SITES = {
     "rakuten": {
         "name": "楽天市場",
         "search": search_rakuten, 
-        "max_limit": 30,
+        "max_limit": 100,
         },
     "yahoo": {
         "name": "Yahoo!ショッピング",
         "search": search_yahoo,
-        "max_limit": 50,
+        "max_limit": 100,
         },
     "serp": {
         "name": "Google Shopping",
         "search": search_serp,
-        "max_limit": 30,
+        "max_limit": 40,
         },
 }
 

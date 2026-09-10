@@ -10,7 +10,7 @@ init_db()
 # 表示件数
 LIMITS = (5, 10, 20, 30)
 # 各APIから取得する件数
-FETCH_LIMIT = 50
+FETCH_LIMIT = 100
 # 価格順の指定
 SORTS = {"price_asc": "価格の安い順", "price_desc": "価格の高い順"}
 

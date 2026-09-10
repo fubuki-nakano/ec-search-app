@@ -14,9 +14,10 @@ def search_serp(keyword, limit=5, sort="price_asc", min_price=None, max_price=No
     """serpの検索結果を共通形式に変換して返す"""
     if not serp_api:
         raise ValueError("SerpAPIキーが未設定です")
+
     # APIに送る検索条件
     params = {
-        "engine": "google_shopping",
+        "engine": "google_shopping_light",
         "q": keyword,
         "gl": "jp",
         "hl": "ja",
@@ -34,10 +35,13 @@ def search_serp(keyword, limit=5, sort="price_asc", min_price=None, max_price=No
     response.raise_for_status()
     # JSONをPython用のデータに
     data = response.json()
+# Google Shoppingの商品一覧を取得
+    shopping_results = data.get("shopping_results", [])
+
     # 結果を入れる空リスト
     serp_results = []
     # 共通の表示形式に変換
-    for item in data.get("shopping_results", []):
+    for item in shopping_results:
         serp_results.append({
             "name": item.get("title", ""),
             "price": int(item["extracted_price"]),
