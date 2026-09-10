@@ -1,3 +1,4 @@
+import time
 import os
 import requests
 from dotenv import load_dotenv
@@ -60,6 +61,9 @@ def search_yahoo(keyword, limit=5, sort="price_asc", min_price=None, max_price=N
 
         # 次の取得開始位置へ
         start += results_limit
+        # API検索時のクールタイム
+        if len(yahoo_results) < limit:
+            time.sleep(1)
 
     # 商品一覧を search.py に返す
     return yahoo_results

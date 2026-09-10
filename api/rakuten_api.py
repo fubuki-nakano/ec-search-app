@@ -1,3 +1,4 @@
+import time
 import os
 import requests
 from dotenv import load_dotenv
@@ -42,7 +43,7 @@ def search_rakuten(keyword, limit=5, sort="price_asc", min_price=None, max_price
     rakuten_results = []
 
     # ↓ここから楽天APIへ問い合わせ
-    
+
     # 欲しい件数に届くまで繰り返す
     while len(rakuten_results) < limit:
         # 今回取得するページ番号を指定
@@ -74,6 +75,7 @@ def search_rakuten(keyword, limit=5, sort="price_asc", min_price=None, max_price
             # 欲しい件数に到達したら商品追加を終了
             if len(rakuten_results) >= limit:
                 break
-
+        # API検索時のクールタイム
+        time.sleep(1)
     # 商品一覧を search.py に返す
     return rakuten_results

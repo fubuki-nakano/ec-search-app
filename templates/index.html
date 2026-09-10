@@ -60,11 +60,25 @@
     <option value="500000">
   </datalist>
     <label for="limit">1ページの表示件数</label>
-    <select id="limit" name="limit">
-      {% for value in limits %}
-      <option value="{{ value }}" {% if value|string == limit %}selected{% endif %}>{{ value }}件</option>
-      {% endfor %}
-    </select>
+<select
+  id="limit"
+  name="limit"
+  {% if search_id %}
+  onchange="
+    const params = new URLSearchParams(window.location.search);
+    params.set('search_id', '{{ search_id }}');
+    params.set('limit', this.value);
+    params.set('page', '1');
+    window.location.search = params.toString();
+  "
+  {% endif %}
+>
+  {% for value in limits %}
+  <option value="{{ value }}" {% if value|string == limit %}selected{% endif %}>
+    {{ value }}件
+  </option>
+  {% endfor %}
+</select>
     <label for="sort">並び順</label>
     <select id="sort" name="sort">
       {% for value, label in sorts.items() %}

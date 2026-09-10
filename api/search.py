@@ -42,8 +42,9 @@ def search_products(keyword, selected_sites, fetch_limit, sort, min_price=None, 
             # APIの検索結果にサイト名を追加して表示
             products.extend({**product, "site": site["name"]} for product in results)
             # APIへの通信失敗等でもアプリが停止しない処理
-        except (requests.RequestException, ValueError, KeyError, TypeError):
-            # 例外にはAPIキー付きURLが含まれる場合があるため表示しない。
+        except (requests.RequestException, ValueError, KeyError, TypeError) as e:
+            print(f"{site['name']} エラー:", repr(e))
+
             errors.append(
                 f"{site['name']}の商品を取得できませんでした。"
                 "APIキーの設定や通信状況を確認し、時間をおいて再検索してください。"
