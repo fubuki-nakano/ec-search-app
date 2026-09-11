@@ -59,3 +59,82 @@ text-decoration: none;
 .product-link:hover {
 text-decoration: underline;
 }
+/* ページジャンプ用 */
+.page-jump-inline {
+display: inline;
+margin: 0;
+padding: 0;
+border: none;
+background: none;
+}
+
+.page-jump-input {
+width: 32px;
+height: 28px;
+padding: 0;
+margin: 0;
+text-align: center;
+font-size: 1rem;
+border: 1px solid #aaa;
+border-radius: 3px;
+}
+
+/* Chrome・Edge・Safariの上下矢印を消す */
+.page-jump-input::-webkit-outer-spin-button,
+.page-jump-input::-webkit-inner-spin-button {
+-webkit-appearance: none;
+margin: 0;
+}
+
+/* Firefoxの上下矢印を消す */
+.page-jump-input {
+-moz-appearance: textfield;
+appearance: textfield;
+}
+
+/* サイト別比較の全体 */
+.compare-grid {
+display: flex;
+gap: 16px;
+overflow-x: auto;
+align-items: flex-start;
+padding-bottom: 8px;
+}
+
+/* サイトごとの列 */
+.compare-column {
+flex: 0 0 320px;
+min-width: 0;
+}
+
+/* サイトごとの列 */
+.compare-column {
+min-width: 0;
+}
+
+/* 各商品 */
+.compare-item {
+padding: 12px;
+margin-bottom: 16px;
+border: 1px solid #ccc;
+}
+
+/* 比較表示の商品名 */
+.compare-title {
+display: -webkit-box;
+-webkit-box-orient: vertical;
+line-clamp: 2;
+-webkit-line-clamp: 2;
+overflow: hidden;
+
+line-height: 1.5;
+min-height: 3em;
+overflow-wrap: anywhere;
+}
+
+/* サイト別比較の価格を目立たせる */
+.compare-item .price {
+font-size: 1.4rem;
+font-weight: bold;
+margin: 12px 0;
+}

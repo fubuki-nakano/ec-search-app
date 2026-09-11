@@ -75,6 +75,20 @@ def count_results(search_id):
 
     return row[0]
 
+# 指定したサイトの検索結果件数を取得
+def count_results_by_site(search_id, site_name):
+    with get_connection() as conn:
+        row = conn.execute(
+            """
+            SELECT COUNT(*)
+            FROM search_results
+            WHERE search_id = ?
+            AND site = ?
+            """,
+            (search_id, site_name),
+        ).fetchone()
+
+    return row[0]
 
 # 指定したページの商品だけ取得
 def get_results_page(search_id, page, page_size, sort="price_asc"):
@@ -104,6 +118,29 @@ def clear_results():
         conn.execute("""
             DELETE FROM search_results
         """)
+
+# 指定したサイトの商品だけページごとに取得
+def get_results_by_site(search_id, site_name, page, page_size, sort="price_asc"):
+    # 安い順・高い順をSQL用に変換
+    order = "DESC" if sort == "price_desc" else "ASC"
+
+    # 何件飛ばして取得を始めるか
+    offset = (page - 1) * page_size
+
+    with get_connection() as conn:
+        rows = conn.execute(
+            f"""
+            SELECT site, name, price, url, image
+            FROM search_results
+            WHERE search_id = ?
+            AND site = ?
+            ORDER BY price {order}
+            LIMIT ? OFFSET ?
+            """,
+            (search_id, site_name, page_size, offset),
+        ).fetchall()
+
+    return [dict(row) for row in rows]
 
 # データベース作成命令
 if __name__ == "__main__":
