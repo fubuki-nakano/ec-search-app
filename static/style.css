@@ -138,3 +138,31 @@ font-size: 1.4rem;
 font-weight: bold;
 margin: 12px 0;
 }
+/* 評価の☆ */
+.rating-row {
+display: flex;
+align-items: center;
+gap: 6px;
+white-space: nowrap;
+}
+/* 評価の☆ */
+.star-rating {
+position: relative;
+display: inline-block;
+color: #ccc;
+}
+/* 評価の☆ */
+.star-rating::before {
+content: "★★★★★";
+position: absolute;
+left: 0;
+top: 0;
+width: var(--rating-percent);
+overflow: hidden;
+color: #000;
+white-space: nowrap;
+}
+
+
+
+

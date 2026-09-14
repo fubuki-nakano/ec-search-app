@@ -23,7 +23,10 @@ def init_db():
                 name TEXT NOT NULL,
                 price INTEGER NOT NULL,
                 url TEXT,
-                image TEXT
+                image TEXT,
+                shop TEXT,
+                rating REAL,
+                review_count INTEGER
             )
         """)
 
@@ -34,8 +37,8 @@ def save_results(search_id, products):
             conn.execute(
                 """
                 INSERT INTO search_results
-                (search_id, site, name, price, url, image)
-                VALUES (?, ?, ?, ?, ?, ?)
+                (search_id, site, name, price, url, image, shop, rating, review_count)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     search_id,
@@ -44,6 +47,9 @@ def save_results(search_id, products):
                     product["price"],
                     product["url"],
                     product["image"],
+                    product["shop"],
+                    product["rating"],
+                    product["review_count"],
                 ),
             )
 
@@ -92,8 +98,13 @@ def count_results_by_site(search_id, site_name):
 
 # 指定したページの商品だけ取得
 def get_results_page(search_id, page, page_size, sort="price_asc"):
-    # 安い順・高い順をSQL用に変換
-    order = "DESC" if sort == "price_desc" else "ASC"
+    # 並び順をSQL用に変換
+    if sort == "rating_desc":
+        order_by = "rating DESC, review_count DESC"
+    elif sort == "price_desc":
+        order_by = "price DESC"
+    else:
+        order_by = "price ASC"
 
     # 何件飛ばして取得を始めるか
     offset = (page - 1) * page_size
@@ -101,10 +112,10 @@ def get_results_page(search_id, page, page_size, sort="price_asc"):
     with get_connection() as conn:
         rows = conn.execute(
             f"""
-            SELECT site, name, price, url, image
+            SELECT site, name, price, url, image, shop, rating, review_count
             FROM search_results
             WHERE search_id = ?
-            ORDER BY price {order}
+            ORDER BY {order_by}
             LIMIT ? OFFSET ?
             """,
             (search_id, page_size, offset),
@@ -121,8 +132,13 @@ def clear_results():
 
 # 指定したサイトの商品だけページごとに取得
 def get_results_by_site(search_id, site_name, page, page_size, sort="price_asc"):
-    # 安い順・高い順をSQL用に変換
-    order = "DESC" if sort == "price_desc" else "ASC"
+    # 並び順をSQL用に変換
+    if sort == "rating_desc":
+        order_by = "rating DESC, review_count DESC"
+    elif sort == "price_desc":
+        order_by = "price DESC"
+    else:
+        order_by = "price ASC"
 
     # 何件飛ばして取得を始めるか
     offset = (page - 1) * page_size
@@ -130,11 +146,11 @@ def get_results_by_site(search_id, site_name, page, page_size, sort="price_asc")
     with get_connection() as conn:
         rows = conn.execute(
             f"""
-            SELECT site, name, price, url, image
+            SELECT site, name, price, url, image, shop, rating, review_count
             FROM search_results
             WHERE search_id = ?
             AND site = ?
-            ORDER BY price {order}
+            ORDER BY {order_by}
             LIMIT ? OFFSET ?
             """,
             (search_id, site_name, page_size, offset),

@@ -22,10 +22,10 @@ LIMITS = (5, 10, 20, 30)
 FETCH_LIMIT = 100
 # 価格順の指定
 SORTS = {
-    "price_asc": 
-    "価格の安い順", 
-    "price_desc": 
-    "価格の高い順"
+    "price_desc": "価格の高い順",
+    "price_asc": "価格の安い順", 
+    "rating_desc": "評価の高い順",
+    "review_desc": "レビューの多い順",
     }
 # 検索精度の指定
 SEARCH_MODES = {
@@ -35,8 +35,8 @@ SEARCH_MODES = {
 }
 # 表示方法の指定
 DISPLAY_MODES = {
-    "list": "価格順一覧",
     "compare": "サイト別比較",
+    "list": "価格順一覧",
 }
 
 # http://127.0.0.1:5000/←の/にアクセスが来たら
@@ -71,6 +71,8 @@ def index():
     products, errors = [], []
     # サイト別比較用の商品データ
     products_by_site = {}
+    # サイトごとの商品件数
+    site_counts = {}
     total_products = 0
     total_pages = 0
 
@@ -156,6 +158,8 @@ def index():
                         search_id,
                         site_name,
                     )
+                    # site_countsの辞書に"サイト名”：件数で入れる
+                    site_counts[site_name] = site_count
                     # このサイトの総ページ数
                     pages = (site_count + page_size - 1) // page_size
                     site_pages.append(pages)
@@ -193,6 +197,7 @@ def index():
         max_price_text=max_price_text,
         products=products,
         products_by_site=products_by_site,
+        site_counts=site_counts,
         errors=errors,
         searched=searched,
         page=page,

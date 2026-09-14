@@ -36,6 +36,11 @@ def search_products(
 ):
     # 商品結果とエラーを入れる空リスト
     products, errors = [], []
+    # APIに渡す並び順
+    if sort == "rating_desc":
+        api_sort = None
+    else:
+        api_sort = sort
     # 除外キーワードを空白ごとに分ける
     # .split()は、空白を基準に文字列を分割する
     exclude_keywords = exclude_keywords_text.lower().split()
@@ -51,7 +56,7 @@ def search_products(
             site_limit = min(fetch_limit, site["max_limit"])
             # API検索
             results = site["search"](keyword, 
-            limit=site_limit, sort=sort,min_price=min_price,
+            limit=site_limit, sort=api_sort,min_price=min_price,
             max_price=max_price,)
             # APIの検索結果にサイト名を追加して表示
             # 取得した商品を1件ずつ確認
@@ -81,7 +86,19 @@ def search_products(
                 f"{site['name']}では条件に合う商品を取得できませんでした。"
                 "検索条件を変えて再検索するか、通信状況を確認して時間をおいてお試しください。"
             )
-    # APIから帰ってきた情報をまとめて価格順に並べる
-    products.sort(key=lambda product: product["price"], reverse=sort == "price_desc")
+    # APIから取得した商品を指定された順番に並べる
+    if sort == "rating_desc":
+        products.sort(
+            key=lambda product: (
+                product["rating"],
+                product["review_count"]
+            ),
+            reverse=True
+        )
+    else:
+        products.sort(
+            key=lambda product: product["price"],
+            reverse=sort == "price_desc"
+        )
     # 価格順に並べた検索結果をすべてapp.pyへ返す
     return products, errors

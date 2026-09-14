@@ -28,10 +28,15 @@ def search_rakuten(keyword, limit=5, sort="price_asc", min_price=None, max_price
         "keyword": keyword,
         "format": "json",
         "hits": hits,
-        "page": page,#←ここはそのまま残してる
-        # ここで価格順に直すためにAPIから帰ってきた情報を変換
-        "sort": {"price_asc": "+itemPrice", "price_desc": "-itemPrice"}[sort],
+        "page": page,
     }
+
+    # 並び順が指定されている場合だけ楽天APIへ渡す
+    if sort is not None:
+        params["sort"] = {
+            "price_asc": "+itemPrice",
+            "price_desc": "-itemPrice"
+        }[sort]
 
     # 価格の上限下限を指定
     if min_price is not None:
@@ -71,6 +76,9 @@ def search_rakuten(keyword, limit=5, sort="price_asc", min_price=None, max_price
                 "price": int(item["itemPrice"]),
                 "url": item["itemUrl"],
                 "image": images[0].get("imageUrl", "") if images else "",
+                "shop": item.get("shopName", ""),
+                "rating": item.get("reviewAverage") or 0,
+                "review_count": item.get("reviewCount") or 0,
             })
             # 欲しい件数に到達したら商品追加を終了
             if len(rakuten_results) >= limit:

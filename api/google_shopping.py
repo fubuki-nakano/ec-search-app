@@ -22,8 +22,14 @@ def search_serp(keyword, limit=5, sort="price_asc", min_price=None, max_price=No
         "gl": "jp",
         "hl": "ja",
         "api_key": serp_api,
-        "sort_by": {"price_asc": 1, "price_desc": 2}[sort],
     }
+
+    if sort is not None:
+        params["sort_by"] = {
+            "price_asc": 1,
+            "price_desc": 2
+        }[sort]
+
     # 価格の上限下限を決める
     if min_price is not None:
         params["min_price"] = min_price
@@ -42,11 +48,25 @@ def search_serp(keyword, limit=5, sort="price_asc", min_price=None, max_price=No
     serp_results = []
     # 共通の表示形式に変換
     for item in shopping_results:
+
+        # 最初の商品だけ追加情報を確認
+        if len(serp_results) < 5:
+                print("商品名:", item.get("title"))
+                print("ショップ:", item.get("source"))
+                print("評価:", item.get("rating"))
+                print("レビュー件数:", item.get("reviews"))
+                print("配送:", item.get("delivery"))
+                print("中古状態:", item.get("second_hand_condition"))
+                print("--------------------")
+
         serp_results.append({
             "name": item.get("title", ""),
             "price": int(item["extracted_price"]),
             "url": item.get("product_link", item.get("link", "")),
             "image": item.get("thumbnail", ""),
+            "shop": item.get("source", ""),
+            "rating": item.get("rating") or 0,
+            "review_count": item.get("reviews") or 0,
         })
     # 指定された件数だけ search.py に返す
     return serp_results[:limit]

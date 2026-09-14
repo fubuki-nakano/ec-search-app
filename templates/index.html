@@ -154,7 +154,9 @@
           <tr>
             <th scope="col">画像</th>
             <th scope="col">商品名</th>
+            <th scope="col">評価</th>
             <th scope="col">価格</th>
+            <th scope="col">ショップ</th>
             <th scope="col">サイト</th>
           </tr>
         </thead>
@@ -198,9 +200,24 @@
 
             <td>{{ product.name }}</td>
 
+            <td>
+              <div class="rating-row">
+                <span
+                  class="star-rating"
+                  style="--rating-percent: {{ product.rating / 5 * 100 }}%;"
+                >
+                  ★★★★★
+                </span>
+
+                {{ product.rating }}（{{ product.review_count }}件）
+              </div>
+            </td>
+
             <td class="price">
               ¥{{ "{:,}".format(product.price) }}
             </td>
+
+            <td>{{ product.shop }}</td>
 
             <td>{{ product.site }}</td>
 
@@ -223,7 +240,7 @@
 
         <section class="compare-column">
 
-          <h3>{{ site_name }}</h3>
+          <h3>{{ site_name }}（{{ site_counts[site_name] }}件）</h3>
 
           {% if site_products %}
 
@@ -241,12 +258,21 @@
                   >
                 {% endif %}
 
-                <p class="compare-title" title="{{ product.name }}">
-                  {{ product.name }}</p>
+              <p class="rating-row">
+                <span
+                  class="star-rating"
+                  style="--rating-percent: {{ product.rating / 5 * 100 }}%;"
+                >
+                  ★★★★★
+                </span>
+
+                {{ product.rating }}（{{ product.review_count }}件）
+              </p>
 
                 <p class="price">
                   ¥{{ "{:,}".format(product.price) }}
                 </p>
+                <p>{{ product.shop }}</p>
 
                 {% if product.url.startswith(('https://', 'http://')) %}
                   <a

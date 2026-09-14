@@ -24,8 +24,13 @@ def search_yahoo(keyword, limit=5, sort="price_asc", min_price=None, max_price=N
         "query": keyword,
         "results": results_limit,
         "start": start,
-        "sort": {"price_asc": "+price", "price_desc": "-price"}[sort],
     }
+    if sort is not None:
+        params["sort"] = {
+            "price_asc": "+price",
+            "price_desc": "-price"
+        }[sort]
+
     # 価格の上限下限を指定
     if min_price is not None:
         params["price_from"] = min_price
@@ -49,11 +54,16 @@ def search_yahoo(keyword, limit=5, sort="price_asc", min_price=None, max_price=N
             break
         # 共通の表示形式に変換
         for item in data["hits"]:
+            review = item.get("review") or {}
+            seller = item.get("seller") or {}
             yahoo_results.append({
                 "name": item["name"],
                 "price": int(item["price"]),
                 "url": item["url"],
                 "image": (item.get("image") or {}).get("medium", ""),
+                "shop": seller.get("name", ""),
+                "rating": review.get("rate") or 0,
+                "review_count": review.get("count") or 0,
             })
                 # 欲しい件数に到達したら商品追加を終了
             if len(yahoo_results) >= limit:
