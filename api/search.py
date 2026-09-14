@@ -37,7 +37,7 @@ def search_products(
     # 商品結果とエラーを入れる空リスト
     products, errors = [], []
     # APIに渡す並び順
-    if sort == "rating_desc":
+    if sort in ("rating_desc", "review_desc"):
         api_sort = None
     else:
         api_sort = sort
@@ -95,7 +95,20 @@ def search_products(
             ),
             reverse=True
         )
+    elif sort == "review_desc":
+        products.sort(
+            key=lambda product: (
+                product["review_count"],
+                product["rating"]
+            ),
+            reverse=True
+        )
     else:
+        products.sort(
+            key=lambda product: product["price"],
+            reverse=sort == "price_desc"
+        )
+
         products.sort(
             key=lambda product: product["price"],
             reverse=sort == "price_desc"

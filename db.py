@@ -101,6 +101,8 @@ def get_results_page(search_id, page, page_size, sort="price_asc"):
     # 並び順をSQL用に変換
     if sort == "rating_desc":
         order_by = "rating DESC, review_count DESC"
+    elif sort == "review_desc":
+        order_by = "review_count DESC, rating DESC"
     elif sort == "price_desc":
         order_by = "price DESC"
     else:
@@ -135,6 +137,8 @@ def get_results_by_site(search_id, site_name, page, page_size, sort="price_asc")
     # 並び順をSQL用に変換
     if sort == "rating_desc":
         order_by = "rating DESC, review_count DESC"
+    elif sort == "review_desc":
+        order_by = "review_count DESC, rating DESC"
     elif sort == "price_desc":
         order_by = "price DESC"
     else:
