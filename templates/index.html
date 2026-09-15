@@ -1,428 +1,575 @@
 <!doctype html>
 <!--日本語指定-->
 <html lang="ja">
-<head>
-  <meta charset="utf-8">
-<!--画面表示設定-->
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>商品比較検索</title>
-<!--CSS読み込み-->
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-<main>
-  <h1>商品比較検索</h1>
-  <!-- getでapp.pyへ -->
-  <form method="get" action="/">
-    <fieldset>
-      <legend>検索対象サイト（複数選択可）</legend>
-      <!--app.py から渡された sites を順番に処理-->
-      {% for id, site in sites.items() %}
-      <!--サイト指定チェックボックス-->
-      <label><input type="checkbox" name="sites" value="{{ id }}" {% if id in selected %}checked{% endif %}> {{ site.name }}</label>
-      {% endfor %}
-    </fieldset>
-    <label for="keyword">商品名</label>
-    <input id="keyword" name="keyword" type="search" value="{{ keyword }}" maxlength="128" required placeholder="例：イヤホン">
-    <!-- 除外キーワード -->
-    <label for="exclude_keywords">除外キーワード</label>
-    <input
-      id="exclude_keywords"
-      name="exclude_keywords"
-      type="text"
-      value="{{ exclude_keywords_text }}"
-      maxlength="128"
-      placeholder="例：ケース カバー スタンド"
-    >
+  <head>
+    <meta charset="utf-8">
+    <!--画面表示設定-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>商品比較検索</title>
+    <!--CSS読み込み-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <main>
+      <h1>商品比較検索</h1>
+      <!-- 閲覧履歴を開くボタン -->
+      <button type="button" id="history-open-button">
+        閲覧履歴
+      </button>
+      <!-- getでapp.pyへ -->
+      <form method="get" action="/">
+        <fieldset>
+          <legend>検索対象サイト（複数選択可）</legend>
+          <!--app.py から渡された sites を順番に処理-->
+          {% for id, site in sites.items() %}
+            <!--サイト指定チェックボックス-->
+            <label><input type="checkbox" name="sites" value="{{ id }}" {% if id in selected %}checked{% endif %}> {{ site.name }}</label>
+          {% endfor %}
+        </fieldset>
+        <label for="keyword">商品名</label>
+        <input id="keyword" name="keyword" type="search" value="{{ keyword }}" maxlength="128" required placeholder="例：イヤホン">
+        <!-- 除外キーワード -->
+        <label for="exclude_keywords">除外キーワード</label>
+        <input
+          id="exclude_keywords"
+          name="exclude_keywords"
+          type="text"
+          value="{{ exclude_keywords_text }}"
+          maxlength="128"
+          placeholder="例：ケース カバー スタンド"
+        >
 
-<!--最低価格の指定-->
-    <label for="min_price">最低価格</label>
-  <input
-    id="min_price"
-    name="min_price"
-    type="number"
-    min="0"
-    value="{{ min_price_text }}"
-    list="price_options"
-    placeholder="指定なし"
-  >
+        <!--最低価格の指定-->
+        <label for="min_price">最低価格</label>
+        <input
+          id="min_price"
+          name="min_price"
+          type="number"
+          min="0"
+          value="{{ min_price_text }}"
+          list="price_options"
+          placeholder="指定なし"
+        >
 
-  <span>〜</span>
-<!-- 最高価格の指定 -->
-  <label for="max_price">最高価格</label>
-  <input
-    id="max_price"
-    name="max_price"
-    type="number"
-    min="0"
-    value="{{ max_price_text }}"
-    list="price_options"
-    placeholder="指定なし"
-  >
-<!-- 表示件数 -->
-  <datalist id="price_options">
-    <option value="5000">
-    <option value="10000">
-    <option value="20000">
-    <option value="30000">
-    <option value="50000">
-    <option value="100000">
-    <option value="200000">
-    <option value="500000">
-  </datalist>
-    <label for="limit">1ページの表示件数</label>
-<select
-  id="limit"
-  name="limit"
-  {% if search_id %}
-  onchange="
-    const params = new URLSearchParams(window.location.search);
-    params.set('search_id', '{{ search_id }}');
-    params.set('limit', this.value);
-    params.set('page', '1');
-    window.location.search = params.toString();
-  "
-  {% endif %}
->
-  {% for value in limits %}
-  <option value="{{ value }}" {% if value|string == limit %}selected{% endif %}>
-    {{ value }}件
-  </option>
-  {% endfor %}
-</select>
-<!-- 検索精度 -->
-<label for="search_mode">検索精度</label>
-<select id="search_mode" name="search_mode">
-  {% for value, label in search_modes.items() %}
-  <option value="{{ value }}" {% if value == search_mode %}selected{% endif %}>
-    {{ label }}
-  </option>
-  {% endfor %}
-</select>
-<!-- 表示方法 -->
-<label for="display_mode">表示方法</label>
-<select
-  id="display_mode"
-  name="display_mode"
-  {% if search_id %}
-  onchange="
-    const displayParams = new URLSearchParams(window.location.search);
-    displayParams.set('search_id', '{{ search_id }}');
-    displayParams.set('display_mode', this.value);
-    displayParams.set('page', '1');
-    window.location.search = displayParams.toString();
-  "
-  {% endif %}
->
-  {% for value, label in display_modes.items() %}
-  <option value="{{ value }}" {% if value == display_mode %}selected{% endif %}>
-    {{ label }}
-  </option>
-  {% endfor %}
-</select>
-<!-- 並び順 -->
-    <label for="sort">並び順</label>
-    <select id="sort" name="sort">
-      {% for value, label in sorts.items() %}
-      <option value="{{ value }}" {% if value == sort %}selected{% endif %}>{{ label }}</option>
-      {% endfor %}
-    </select>
-    <!-- 検索 -->
-    <button type="submit">検索</button>
-  </form>
-  <!--エラー発生時の表示-->
-  {% for error in errors %}<p class="error" role="alert">{{ error }}</p>{% endfor %}
-  <!--検索した後かどうか-->
-  {% if searched %}
-  <!--件数を表示-->
-  <h2>検索結果：全{{ total_products }}件</h2>
-<!-- 検索結果がある場合 -->
-{% if total_products > 0 %}
+        <span>〜</span>
+        <!-- 最高価格の指定 -->
+        <label for="max_price">最高価格</label>
+        <input
+          id="max_price"
+          name="max_price"
+          type="number"
+          min="0"
+          value="{{ max_price_text }}"
+          list="price_options"
+          placeholder="指定なし"
+        >
+        <!-- 表示件数 -->
+        <datalist id="price_options">
+          <option value="5000">
+          <option value="10000">
+          <option value="20000">
+          <option value="30000">
+          <option value="50000">
+          <option value="100000">
+          <option value="200000">
+          <option value="500000">
+        </datalist>
+        <label for="limit">1ページの表示件数</label>
+        <select
+          id="limit"
+          name="limit"
+          {% if search_id %}
+            onchange="
+              const params = new URLSearchParams(window.location.search);
+              params.set('search_id', '{{ search_id }}');
+              params.set('limit', this.value);
+              params.set('page', '1');
+              window.location.search = params.toString();
+            "
+          {% endif %}
+        >
+          {% for value in limits %}
+            <option value="{{ value }}" {% if value|string == limit %}selected{% endif %}>
+              {{ value }}件
+            </option>
+          {% endfor %}
+        </select>
+        <!-- 検索精度 -->
+        <label for="search_mode">検索精度</label>
+        <select id="search_mode" name="search_mode">
+          {% for value, label in search_modes.items() %}
+            <option value="{{ value }}" {% if value == search_mode %}selected{% endif %}>
+              {{ label }}
+            </option>
+          {% endfor %}
+        </select>
+        <!-- 表示方法 -->
+        <label for="display_mode">表示方法</label>
+        <select
+          id="display_mode"
+          name="display_mode"
+          {% if search_id %}
+            onchange="
+              const displayParams = new URLSearchParams(window.location.search);
+              displayParams.set('search_id', '{{ search_id }}');
+              displayParams.set('display_mode', this.value);
+              displayParams.set('page', '1');
+              window.location.search = displayParams.toString();
+            "
+          {% endif %}
+        >
+          {% for value, label in display_modes.items() %}
+            <option value="{{ value }}" {% if value == display_mode %}selected{% endif %}>
+              {{ label }}
+            </option>
+          {% endfor %}
+        </select>
+        <!-- 並び順 -->
+        <label for="sort">並び順</label>
+        <select id="sort" name="sort">
+          {% for value, label in sorts.items() %}
+            <option value="{{ value }}" {% if value == sort %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+        <!-- 検索 -->
+        <button type="submit">検索</button>
+      </form>
+      <!--エラー発生時の表示-->
+      {% for error in errors %}<p class="error" role="alert">{{ error }}</p>{% endfor %}
+      <!--検索した後かどうか-->
+      {% if searched %}
+        <!--件数を表示-->
+        <h2>検索結果：全{{ total_products }}件</h2>
+        <!-- 検索結果がある場合 -->
+        {% if total_products > 0 %}
 
-  <!-- 価格順一覧 -->
-  {% if display_mode == "list" %}
+          <!-- 価格順一覧 -->
+          {% if display_mode == "list" %}
 
-    <p>
-      商品価格で比較しています。
-      送料・ポイントは含みません。
-      最新の価格は商品ページで確認してください。
-    </p>
+            <p>
+              商品価格で比較しています。
+              送料・ポイントは含みません。
+              最新の価格は商品ページで確認してください。
+            </p>
 
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th scope="col">画像</th>
-            <th scope="col">商品名</th>
-            <th scope="col">評価</th>
-            <th scope="col">価格</th>
-            <th scope="col">ショップ</th>
-            <th scope="col">サイト</th>
-          </tr>
-        </thead>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">画像</th>
+                    <th scope="col">商品名</th>
+                    <th scope="col">評価</th>
+                    <th scope="col">価格</th>
+                    <th scope="col">ショップ</th>
+                    <th scope="col">サイト</th>
+                  </tr>
+                </thead>
 
-        <tbody>
-        {% for product in products %}
-          <tr>
+                <tbody>
+                  {% for product in products %}
+                    <tr>
 
-            <td>
-              {% if product.image.startswith(('https://', 'http://')) %}
-                {% if product.url.startswith(('https://', 'http://')) %}
-                  <a
-                    class="product-link"
-                    href="{{ product.url }}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <img
-                      src="{{ product.image }}"
-                      alt="{{ product.name }}"
-                      loading="lazy"
-                      width="100"
-                      height="100"
-                    >
-                    <br>
-                    商品ページへ
-                  </a>
-                {% else %}
-                  <img
-                    src="{{ product.image }}"
-                    alt="{{ product.name }}"
-                    loading="lazy"
-                    width="100"
-                    height="100"
-                  >
-                {% endif %}
-              {% else %}
-                画像なし
-              {% endif %}
-            </td>
+                      <td>
+                        {% if product.image.startswith(('https://', 'http://')) %}
+                          {% if product.url.startswith(('https://', 'http://')) %}
+                            <a
+                              class="product-link"
+                              href="{{ product.url }}"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              data-name="{{ product.name }}"
+                              data-price="{{ product.price }}"
+                              data-image="{{ product.image }}"
+                              data-site="{{ product.site }}"
+                            >
+                              <img
+                                src="{{ product.image }}"
+                                alt="{{ product.name }}"
+                                loading="lazy"
+                                width="100"
+                                height="100"
+                              >
+                              <br>
+                              商品ページへ
+                            </a>
+                          {% else %}
+                            <img
+                              src="{{ product.image }}"
+                              alt="{{ product.name }}"
+                              loading="lazy"
+                              width="100"
+                              height="100"
+                            >
+                          {% endif %}
+                        {% else %}
+                          画像なし
+                        {% endif %}
+                      </td>
 
-            <td>{{ product.name }}</td>
+                      <td>{{ product.name }}</td>
 
-            <td>
-              <div class="rating-row">
-                <span
-                  class="star-rating"
-                  style="--rating-percent: {{ product.rating / 5 * 100 }}%;"
-                >
-                  ★★★★★
-                </span>
+                      <td>
+                        <div class="rating-row">
+                          <span
+                            class="star-rating"
+                            style="--rating-percent: {{ product.rating / 5 * 100 }}%;"
+                          >
+                            ★★★★★
+                          </span>
 
-                {{ product.rating }}（{{ product.review_count }}件）
-              </div>
-            </td>
+                          {{ product.rating }}（{{ product.review_count }}件）
+                        </div>
+                      </td>
 
-            <td class="price">
-              ¥{{ "{:,}".format(product.price) }}
-            </td>
+                      <td class="price">
+                        ¥{{ "{:,}".format(product.price) }}
+                      </td>
 
-            <td>{{ product.shop }}</td>
+                      <td>{{ product.shop }}</td>
 
-            <td>{{ product.site }}</td>
+                      <td>{{ product.site }}</td>
 
-          </tr>
-        {% endfor %}
-        </tbody>
-      </table>
-    </div>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
 
-  <!-- サイト別比較 -->
-  {% elif display_mode == "compare" %}
+          <!-- サイト別比較 -->
+          {% elif display_mode == "compare" %}
 
-    <p>
-      サイトごとに商品を比較しています。
-    </p>
+            <p>
+              サイトごとに商品を比較しています。
+            </p>
 
-    <div class="compare-grid">
+            <div class="compare-grid">
 
-      {% for site_name, site_products in products_by_site.items() %}
+              {% for site_name, site_products in products_by_site.items() %}
 
-        <section class="compare-column">
+                <section class="compare-column">
 
-          <h3>{{ site_name }}（{{ site_counts[site_name] }}件）</h3>
+                  <h3>{{ site_name }}（{{ site_counts[site_name] }}件）</h3>
 
-          {% if site_products %}
+                  {% if site_products %}
 
-            {% for product in site_products %}
+                    {% for product in site_products %}
 
-              <div class="compare-item">
+                      <div class="compare-item">
 
-                {% if product.image.startswith(('https://', 'http://')) %}
-                  <img
-                    src="{{ product.image }}"
-                    alt="{{ product.name }}"
-                    loading="lazy"
-                    width="100"
-                    height="100"
-                  >
-                {% endif %}
+                        {% if product.image.startswith(('https://', 'http://')) %}
+                          <img
+                            src="{{ product.image }}"
+                            alt="{{ product.name }}"
+                            loading="lazy"
+                            width="100"
+                            height="100"
+                          >
+                        {% endif %}
 
-              <p class="compare-title" title="{{ product.name }}">
-                {{ product.name }}
-                </p>
+                        <p class="compare-title" title="{{ product.name }}">
+                          {{ product.name }}
+                        </p>
 
-              <p class="rating-row">
-                <span
-                  class="star-rating"
-                  style="--rating-percent: {{ product.rating / 5 * 100 }}%;"
-                >
-                  ★★★★★
-                </span>
+                        <p class="rating-row">
+                          <span
+                            class="star-rating"
+                            style="--rating-percent: {{ product.rating / 5 * 100 }}%;"
+                          >
+                            ★★★★★
+                          </span>
 
-                {{ product.rating }}（{{ product.review_count }}件）
-              </p>
+                          {{ product.rating }}（{{ product.review_count }}件）
+                        </p>
 
-                <p class="price">
-                  ¥{{ "{:,}".format(product.price) }}
-                </p>
-                <p>{{ product.shop }}</p>
+                        <p class="price">
+                          ¥{{ "{:,}".format(product.price) }}
+                        </p>
+                        <p>{{ product.shop }}</p>
 
-                {% if product.url.startswith(('https://', 'http://')) %}
-                  <a
-                    href="{{ product.url }}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    商品ページへ
-                  </a>
-                {% endif %}
+                        {% if product.url.startswith(('https://', 'http://')) %}
+                          <a
+                            class="product-link"
+                            href="{{ product.url }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-name="{{ product.name }}"
+                            data-price="{{ product.price }}"
+                            data-image="{{ product.image }}"
+                            data-site="{{ product.site }}"
+                          >
+                            商品ページへ
+                          </a>
+                        {% endif %}
 
-              </div>
+                      </div>
 
-            {% endfor %}
+                    {% endfor %}
 
-          {% else %}
+                  {% else %}
 
-            <p>このページに表示できる商品はありません。</p>
+                    <p>このページに表示できる商品はありません。</p>
+
+                  {% endif %}
+
+                </section>
+
+              {% endfor %}
+
+            </div>
 
           {% endif %}
+          <!-- ページ移動 -->
+          {% if total_pages > 1 %}
+            <nav class="pagination">
 
-        </section>
+              {% if page > 1 %}
+                <a href="{{ url_for(
+                  'index',
+                  keyword=keyword,
+                  sites=selected,
+                  limit=limit,
+                  sort=sort,
+                  min_price=min_price_text,
+                  max_price=max_price_text,
+                  exclude_keywords=exclude_keywords_text,
+                  search_mode=search_mode,
+                  display_mode=display_mode,
+                  search_id=search_id,
+                  page=page - 1
+                ) }}">← 前へ</a>
+              {% endif %}
 
-      {% endfor %}
+              <!-- ページ番号 -->
+              {% for p in range(1, total_pages + 1) %}
 
-    </div>
+                <!-- 現在ページの前後2Pを表示（最初と最後は5P表示） -->
+                {% if p == 1
+                  or p == total_pages
+                  or (p >= page - 2 and p <= page + 2)
+                  or (page <= 3 and p <= 5)
+                  or (page >= total_pages - 2 and p >= total_pages - 4) %}
 
-  {% endif %}
-    <!-- ページ移動 -->
-  {% if total_pages > 1 %}
-  <nav class="pagination">
+                  {% if p == page %}
 
-    {% if page > 1 %}
-    <a href="{{ url_for(
-      'index',
-      keyword=keyword,
-      sites=selected,
-      limit=limit,
-      sort=sort,
-      min_price=min_price_text,
-      max_price=max_price_text,
-      exclude_keywords=exclude_keywords_text,
-      search_mode=search_mode,
-      display_mode=display_mode,
-      search_id=search_id,
-      page=page - 1
-    ) }}">← 前へ</a>
-    {% endif %}
+                    <!-- 現在ページは直接入力できる -->
+                    <form method="get" action="/" class="page-jump-inline">
+                      <input type="hidden" name="keyword" value="{{ keyword }}">
 
-<!-- ページ番号 -->
-{% for p in range(1, total_pages + 1) %}
+                      {% for site in selected %}
+                        <input type="hidden" name="sites" value="{{ site }}">
+                      {% endfor %}
 
-  <!-- 現在ページの前後2Pを表示（最初と最後は5P表示） -->
-  {% if p == 1
-    or p == total_pages
-    or (p >= page - 2 and p <= page + 2)
-    or (page <= 3 and p <= 5)
-    or (page >= total_pages - 2 and p >= total_pages - 4) %}
+                      <input type="hidden" name="limit" value="{{ limit }}">
+                      <input type="hidden" name="sort" value="{{ sort }}">
+                      <input type="hidden" name="min_price" value="{{ min_price_text }}">
+                      <input type="hidden" name="max_price" value="{{ max_price_text }}">
+                      <input type="hidden" name="exclude_keywords" value="{{ exclude_keywords_text }}">
+                      <input type="hidden" name="search_mode" value="{{ search_mode }}">
+                      <input type="hidden" name="display_mode" value="{{ display_mode }}">
+                      <input type="hidden" name="search_id" value="{{ search_id }}">
 
-    {% if p == page %}
+                      <input
+                        class="page-jump-input"
+                        type="number"
+                        name="page"
+                        min="1"
+                        max="{{ total_pages }}"
+                        value="{{ page }}"
+                        aria-label="移動するページ番号"
+                      >
+                    </form>
 
-      <!-- 現在ページは直接入力できる -->
-      <form method="get" action="/" class="page-jump-inline">
-        <input type="hidden" name="keyword" value="{{ keyword }}">
+                  {% else %}
 
-        {% for site in selected %}
-        <input type="hidden" name="sites" value="{{ site }}">
-        {% endfor %}
+                    <a href="{{ url_for(
+                      'index',
+                      keyword=keyword,
+                      sites=selected,
+                      limit=limit,
+                      sort=sort,
+                      min_price=min_price_text,
+                      max_price=max_price_text,
+                      exclude_keywords=exclude_keywords_text,
+                      search_mode=search_mode,
+                      display_mode=display_mode,
+                      search_id=search_id,
+                      page=p
+                    ) }}">{{ p }}</a>
 
-        <input type="hidden" name="limit" value="{{ limit }}">
-        <input type="hidden" name="sort" value="{{ sort }}">
-        <input type="hidden" name="min_price" value="{{ min_price_text }}">
-        <input type="hidden" name="max_price" value="{{ max_price_text }}">
-        <input type="hidden" name="exclude_keywords" value="{{ exclude_keywords_text }}">
-        <input type="hidden" name="search_mode" value="{{ search_mode }}">
-        <input type="hidden" name="display_mode" value="{{ display_mode }}">
-        <input type="hidden" name="search_id" value="{{ search_id }}">
+                  {% endif %}
 
-        <input
-          class="page-jump-input"
-          type="number"
-          name="page"
-          min="1"
-          max="{{ total_pages }}"
-          value="{{ page }}"
-          aria-label="移動するページ番号"
-        >
-      </form>
+                <!-- 左側の省略 -->
+                {% elif p == 2 and page - 2 > 2 %}
+                  <span>…</span>
 
-    {% else %}
+                <!-- 右側の省略 -->
+                {% elif p == total_pages - 1 and page + 2 < total_pages - 1 %}
+                  <span>…</span>
 
-      <a href="{{ url_for(
-        'index',
-        keyword=keyword,
-        sites=selected,
-        limit=limit,
-        sort=sort,
-        min_price=min_price_text,
-        max_price=max_price_text,
-        exclude_keywords=exclude_keywords_text,
-        search_mode=search_mode,
-        display_mode=display_mode,
-        search_id=search_id,
-        page=p
-      ) }}">{{ p }}</a>
+                {% endif %}
 
-    {% endif %}
+              {% endfor %}
 
-  <!-- 左側の省略 -->
-  {% elif p == 2 and page - 2 > 2 %}
-    <span>…</span>
+              {% if page < total_pages %}
+                <a href="{{ url_for(
+                  'index',
+                  keyword=keyword,
+                  sites=selected,
+                  limit=limit,
+                  sort=sort,
+                  min_price=min_price_text,
+                  max_price=max_price_text,
+                  exclude_keywords=exclude_keywords_text,
+                  search_mode=search_mode,
+                  display_mode=display_mode,
+                  search_id=search_id,
+                  page=page + 1
+                ) }}">次へ →</a>
+              {% endif %}
 
-  <!-- 右側の省略 -->
-  {% elif p == total_pages - 1 and page + 2 < total_pages - 1 %}
-    <span>…</span>
+            </nav>
+          {% endif %}
+        <!-- エラー以外で検索結果が０の時 -->
+        {% elif not errors %}<p>該当する商品がありません。商品名を変えて検索してください。</p>{% endif %}
+      {% else %}<p>サイトを選び、商品名を入力して検索してください。</p>{% endif %}
+      <footer>
+        <a href="https://webservice.rakuten.co.jp/">Supported by 楽天ウェブサービス</a>
+        / <a href="https://developer.yahoo.co.jp/sitemap/">Webサービス by Yahoo! JAPAN</a>
+      </footer>
+      <!-- サイドバー表示中の背景 -->
+      <div id="history-overlay" class="history-overlay"></div>
+      <!-- 閲覧履歴サイドバー -->
+      <aside id="history-sidebar" class="history-sidebar">
 
-  {% endif %}
+        <div class="history-header">
+          <h2>最近見た商品</h2>
 
-{% endfor %}
+          <button type="button" id="history-clear-button">
+            履歴を削除
+          </button>
 
-    {% if page < total_pages %}
-    <a href="{{ url_for(
-      'index',
-      keyword=keyword,
-      sites=selected,
-      limit=limit,
-      sort=sort,
-      min_price=min_price_text,
-      max_price=max_price_text,
-      exclude_keywords=exclude_keywords_text,
-      search_mode=search_mode,
-      display_mode=display_mode,
-      search_id=search_id,
-      page=page + 1
-    ) }}">次へ →</a>
-    {% endif %}
+          <button
+            type="button"
+            id="history-close-button"
+            aria-label="閲覧履歴を閉じる"
+          >
+            ×
+          </button>
+        </div>
 
-  </nav>
-  {% endif %}
-  <!-- エラー以外で検索結果が０の時 -->
-  {% elif not errors %}<p>該当する商品がありません。商品名を変えて検索してください。</p>{% endif %}
-  {% else %}<p>サイトを選び、商品名を入力して検索してください。</p>{% endif %}
-  <footer>
-    <a href="https://webservice.rakuten.co.jp/">Supported by 楽天ウェブサービス</a>
-    / <a href="https://developer.yahoo.co.jp/sitemap/">Webサービス by Yahoo! JAPAN</a>
-  </footer>
-</main>
-</body>
+        <div id="history-list">
+          <p>まだ閲覧履歴はありません。</p>
+        </div>
+
+      </aside>
+    </main>
+    <!-- サイドバー内用 -->
+    <script>
+      const historyOpenButton = document.getElementById("history-open-button");
+      const historyCloseButton = document.getElementById("history-close-button");
+      const historySidebar = document.getElementById("history-sidebar");
+      const historyOverlay = document.getElementById("history-overlay");
+      const productLinks = document.querySelectorAll(".product-link");
+      const historyList = document.getElementById("history-list");
+      const historyClearButton = document.getElementById("history-clear-button");
+
+      function displayHistory() {
+        const history = JSON.parse(sessionStorage.getItem("viewHistory")) || [];
+
+        if (history.length === 0) {
+          historyList.innerHTML = "<p>まだ閲覧履歴はありません。</p>";
+          return;
+        }
+        historyList.innerHTML = "";
+
+        history.forEach(function(product) {
+          const item = document.createElement("div");
+          item.classList.add("history-item");
+
+          const image = document.createElement("img");
+          image.src = product.image;
+          image.alt = product.name;
+          image.width = 80;
+          image.height = 80;
+
+          const name = document.createElement("p");
+          name.classList.add("history-title");
+          name.textContent = product.name;
+
+          const price = document.createElement("p");
+          price.textContent = "¥" + Number(product.price).toLocaleString();
+
+          const siteLink = document.createElement("a");
+          siteLink.textContent = product.site + "へ";
+          siteLink.href = product.url;
+          siteLink.target = "_blank";
+          siteLink.rel = "noopener noreferrer";
+
+          const meta = document.createElement("div");
+          meta.classList.add("history-meta");
+
+          const info = document.createElement("div");
+          info.classList.add("history-info");
+
+          meta.appendChild(price);
+          meta.appendChild(siteLink);
+
+          info.appendChild(name);
+          info.appendChild(meta);
+
+          item.appendChild(image);
+          item.appendChild(info);
+
+          historyList.appendChild(item);
+        });
+      }
+
+      productLinks.forEach(function(link) {
+        link.addEventListener("click", function() {
+          const product = {
+            name: link.dataset.name,
+            price: link.dataset.price,
+            image: link.dataset.image,
+            site: link.dataset.site,
+            url: link.href
+          };
+
+          console.log(product);
+
+          let history = JSON.parse(sessionStorage.getItem("viewHistory")) || [];
+
+          history = history.filter(function(item) {
+            return item.url !== product.url;
+          });
+
+          history.unshift(product);
+
+          history = history.slice(0, 30);
+
+          sessionStorage.setItem("viewHistory", JSON.stringify(history));
+        });
+      });
+
+      historyOpenButton.addEventListener("click", function() {
+        displayHistory();
+        historySidebar.classList.add("open");
+        historyOverlay.classList.add("open");
+      });
+
+      historyClearButton.addEventListener("click", function() {
+        sessionStorage.removeItem("viewHistory");
+        displayHistory();
+      });
+
+      historyCloseButton.addEventListener("click", function() {
+        historySidebar.classList.remove("open");
+        historyOverlay.classList.remove("open");
+      });
+
+      historyOverlay.addEventListener("click", function() {
+        historySidebar.classList.remove("open");
+        historyOverlay.classList.remove("open");
+      });
+    </script>
+  </body>
 </html>

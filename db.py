@@ -103,6 +103,14 @@ def get_results_page(search_id, page, page_size, sort="price_asc"):
         order_by = "rating DESC, review_count DESC"
     elif sort == "review_desc":
         order_by = "review_count DESC, rating DESC"
+    elif sort == "recommend_desc":
+        order_by = """
+        CASE
+            WHEN rating = 0 OR review_count = 0 THEN 0
+            ELSE ((review_count * rating) + (20 * 4.0))
+                / (review_count + 20)
+        END DESC
+        """
     elif sort == "price_desc":
         order_by = "price DESC"
     else:
@@ -139,6 +147,14 @@ def get_results_by_site(search_id, site_name, page, page_size, sort="price_asc")
         order_by = "rating DESC, review_count DESC"
     elif sort == "review_desc":
         order_by = "review_count DESC, rating DESC"
+    elif sort == "recommend_desc":
+        order_by = """
+            CASE
+                WHEN rating = 0 OR review_count = 0 THEN 0
+                ELSE ((review_count * rating) + (20 * 4.0))
+                    / (review_count + 20)
+            END DESC
+        """
     elif sort == "price_desc":
         order_by = "price DESC"
     else:

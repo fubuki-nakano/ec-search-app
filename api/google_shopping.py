@@ -49,16 +49,6 @@ def search_serp(keyword, limit=5, sort="price_asc", min_price=None, max_price=No
     # 共通の表示形式に変換
     for item in shopping_results:
 
-        # 最初の商品だけ追加情報を確認
-        if len(serp_results) < 5:
-                print("商品名:", item.get("title"))
-                print("ショップ:", item.get("source"))
-                print("評価:", item.get("rating"))
-                print("レビュー件数:", item.get("reviews"))
-                print("配送:", item.get("delivery"))
-                print("中古状態:", item.get("second_hand_condition"))
-                print("--------------------")
-
         serp_results.append({
             "name": item.get("title", ""),
             "price": int(item["extracted_price"]),

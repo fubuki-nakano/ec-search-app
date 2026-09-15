@@ -22,6 +22,7 @@ LIMITS = (5, 10, 20, 30)
 FETCH_LIMIT = 100
 # 価格順の指定
 SORTS = {
+    "recommend_desc": "おすすめ順",
     "price_desc": "価格の高い順",
     "price_asc": "価格の安い順", 
     "rating_desc": "評価の高い順",

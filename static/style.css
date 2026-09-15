@@ -31,13 +31,6 @@ img { object-fit: contain; }
 /* 楽天・Yahoo!のAPIリンク部分 */
 footer { margin-top: 24px; font-size: 0.85rem; }
 /* ページ切り替え表記 */
-.pagination {
-display: flex;
-justify-content: center;
-align-items: center;
-gap: 20px;
-margin: 24px 0;
-}
 /* 次へ・前への部分 */
 .pagination a {padding: 8px 12px;}
 /* ページ指定ボタン */
@@ -107,11 +100,6 @@ flex: 0 0 320px;
 min-width: 0;
 }
 
-/* サイトごとの列 */
-.compare-column {
-min-width: 0;
-}
-
 /* 各商品 */
 .compare-item {
 padding: 12px;
@@ -163,6 +151,64 @@ color: #000;
 white-space: nowrap;
 }
 
+/* 閲覧履歴サイドバー */
+.history-sidebar {
+    position: fixed;
+    top: 0;
+    right: -360px;
+    width: 320px;
+    height: 100vh;
+    background: white;
+    border-left: 1px solid #ccc;
+    padding: 20px;
+    z-index: 1000;
+    transition: right 0.3s ease;
+    overflow-y: auto;
+    box-sizing: border-box;
+    overscroll-behavior: contain;
+}
 
+/* 閲覧履歴サイドバーを開いた状態 */
+.history-sidebar.open {
+    right: 0;
+}
 
+/* サイドバー表示中の背景 */
+.history-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.25);
+    display: none;
+    z-index: 999;
+}
+.history-overlay.open {
+    display: block;
+}
 
+/* 閲覧履歴の商品1件 */
+.history-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 12px 0;
+    border-bottom: 1px solid #ccc;
+}
+
+/* 閲覧履歴の商品名 */
+.history-title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+
+    line-height: 1.5;
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.history-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}

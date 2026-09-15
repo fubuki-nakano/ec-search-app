@@ -23,6 +23,22 @@ SITES = {
         },
 }
 
+# 評価とレビュー件数からおすすめスコアを計算
+def calculate_recommend_score(product):
+    rating = product["rating"]
+    review_count = product["review_count"]
+
+    # 評価またはレビューがない商品
+    if rating == 0 or review_count == 0:
+        return 0
+    base_rating = 4.0
+    confidence_count = 20
+    score = (
+        review_count / (review_count + confidence_count) * rating
+        + confidence_count / (review_count + confidence_count) * base_rating
+    )
+    return score
+
 # app.pyから渡された情報の受け取り
 def search_products(
     keyword,
@@ -37,7 +53,7 @@ def search_products(
     # 商品結果とエラーを入れる空リスト
     products, errors = [], []
     # APIに渡す並び順
-    if sort in ("rating_desc", "review_desc"):
+    if sort in ("rating_desc", "review_desc", "recommend_desc"):
         api_sort = None
     else:
         api_sort = sort
@@ -103,15 +119,16 @@ def search_products(
             ),
             reverse=True
         )
+    elif sort == "recommend_desc":
+        products.sort(
+            key=calculate_recommend_score,
+            reverse=True
+        )
     else:
         products.sort(
             key=lambda product: product["price"],
             reverse=sort == "price_desc"
         )
 
-        products.sort(
-            key=lambda product: product["price"],
-            reverse=sort == "price_desc"
-        )
-    # 価格順に並べた検索結果をすべてapp.pyへ返す
+    # 指定された順番に並べた検索結果をapp.pyへ返す
     return products, errors
