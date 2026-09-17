@@ -79,6 +79,10 @@ def search_rakuten(keyword, limit=5, sort="price_asc", min_price=None, max_price
                 "shop": item.get("shopName", ""),
                 "rating": item.get("reviewAverage") or 0,
                 "review_count": item.get("reviewCount") or 0,
+                # 送料情報（0: 送料込み、1: 送料別）
+                "postage": item.get("postageFlag"),
+                # ポイント倍率
+                "point_rate": item.get("pointRate") or 1,
             })
             # 欲しい件数に到達したら商品追加を終了
             if len(rakuten_results) >= limit:

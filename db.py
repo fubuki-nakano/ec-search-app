@@ -26,7 +26,10 @@ def init_db():
                 image TEXT,
                 shop TEXT,
                 rating REAL,
-                review_count INTEGER
+                review_count INTEGER,
+                postage INTEGER,
+                point_rate REAL,
+                jan_code TEXT
             )
         """)
 
@@ -37,8 +40,8 @@ def save_results(search_id, products):
             conn.execute(
                 """
                 INSERT INTO search_results
-                (search_id, site, name, price, url, image, shop, rating, review_count)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (search_id, site, name, price, url, image, shop, rating, review_count, postage, point_rate, jan_code)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     search_id,
@@ -50,6 +53,12 @@ def save_results(search_id, products):
                     product["shop"],
                     product["rating"],
                     product["review_count"],
+                    # 送料情報
+                    product.get("postage"),
+                    # ポイント倍率
+                    product.get("point_rate"),
+                    # 同一商品判定用のJANコード
+                    product.get("jan_code", ""),
                 ),
             )
 
@@ -122,7 +131,7 @@ def get_results_page(search_id, page, page_size, sort="price_asc"):
     with get_connection() as conn:
         rows = conn.execute(
             f"""
-            SELECT site, name, price, url, image, shop, rating, review_count
+            SELECT site, name, price, url, image, shop, rating, review_count, postage, point_rate, jan_code
             FROM search_results
             WHERE search_id = ?
             ORDER BY {order_by}
@@ -166,7 +175,7 @@ def get_results_by_site(search_id, site_name, page, page_size, sort="price_asc")
     with get_connection() as conn:
         rows = conn.execute(
             f"""
-            SELECT site, name, price, url, image, shop, rating, review_count
+            SELECT site, name, price, url, image, shop, rating, review_count, postage, point_rate, jan_code
             FROM search_results
             WHERE search_id = ?
             AND site = ?

@@ -38,6 +38,8 @@ SEARCH_MODES = {
 DISPLAY_MODES = {
     "compare": "サイト別比較",
     "list": "価格順一覧",
+    # JANコード・型番などが一致する商品をまとめて比較
+    "same_product": "同一商品比較",
 }
 
 # http://127.0.0.1:5000/←の/にアクセスが来たら
@@ -72,6 +74,8 @@ def index():
     products, errors = [], []
     # サイト別比較用の商品データ
     products_by_site = {}
+    # 同一商品比較用の商品グループ
+    same_product_groups = []
     # サイトごとの商品件数
     site_counts = {}
     total_products = 0
@@ -198,6 +202,7 @@ def index():
         max_price_text=max_price_text,
         products=products,
         products_by_site=products_by_site,
+        same_product_groups=same_product_groups,
         site_counts=site_counts,
         errors=errors,
         searched=searched,

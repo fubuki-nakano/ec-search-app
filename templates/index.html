@@ -15,7 +15,12 @@
       <!-- 閲覧履歴を開くボタン -->
       <button type="button" id="history-open-button">
         閲覧履歴
+      </button> 
+      <!-- お気に入り一覧を開くボタン -->
+      <button type="button" id="favorite-open-button">
+        お気に入り
       </button>
+
       <!-- getでapp.pyへ -->
       <form method="get" action="/">
         <fieldset>
@@ -147,9 +152,11 @@
           {% if display_mode == "list" %}
 
             <p>
-              商品価格で比較しています。
-              送料・ポイントは含みません。
-              最新の価格は商品ページで確認してください。
+            <p>
+              商品価格を基準に比較しています。
+              送料・ポイントは価格の並び順には含みません。
+              最新の価格・送料・ポイントは商品ページで確認してください。
+            </p>
             </p>
 
             <div class="table-wrap">
@@ -160,8 +167,11 @@
                     <th scope="col">商品名</th>
                     <th scope="col">評価</th>
                     <th scope="col">価格</th>
+                    <th scope="col">送料</th>
+                    <th scope="col">ポイント</th>
                     <th scope="col">ショップ</th>
                     <th scope="col">サイト</th>
+                    <th scope="col">お気に入り</th>
                   </tr>
                 </thead>
 
@@ -225,9 +235,43 @@
                         ¥{{ "{:,}".format(product.price) }}
                       </td>
 
+                      <!-- 送料情報 -->
+                      <td>
+                        {% if product.postage == 0 %}
+                          送料込み
+                        {% elif product.postage == 1 %}
+                          送料別
+                        {% else %}
+                          －
+                        {% endif %}
+                      </td>
+
+                      <!-- ポイント倍率 -->
+                      <td>
+                        {% if product.point_rate %}
+                          {{ "{:g}".format(product.point_rate) }}倍
+                        {% else %}
+                          －
+                        {% endif %}
+                      </td>
+
                       <td>{{ product.shop }}</td>
 
                       <td>{{ product.site }}</td>
+                      <td>
+                        <!-- お気に入りに保存するための商品情報 -->
+                        <button
+                          type="button"
+                          class="favorite-button"
+                          data-name="{{ product.name }}"
+                          data-price="{{ product.price }}"
+                          data-image="{{ product.image }}"
+                          data-site="{{ product.site }}"
+                          data-url="{{ product.url }}"
+                        >
+                          ☆ お気に入り
+                        </button>
+                      </td>
 
                     </tr>
                   {% endfor %}
@@ -286,6 +330,26 @@
                         </p>
                         <p>{{ product.shop }}</p>
 
+                        <!-- 送料情報 -->
+                        <p>
+                          {% if product.postage == 0 %}
+                            送料込み
+                          {% elif product.postage == 1 %}
+                            送料別
+                          {% else %}
+                            送料：－
+                          {% endif %}
+                        </p>
+
+                        <!-- ポイント倍率 -->
+                        <p>
+                          {% if product.point_rate %}
+                            ポイント：{{ "{:g}".format(product.point_rate) }}倍
+                          {% else %}
+                            ポイント：－
+                          {% endif %}
+                        </p>
+
                         {% if product.url.startswith(('https://', 'http://')) %}
                           <a
                             class="product-link"
@@ -300,6 +364,19 @@
                             商品ページへ
                           </a>
                         {% endif %}
+
+                        <!-- サイト別比較用のお気に入りボタン -->
+                        <button
+                          type="button"
+                          class="favorite-button"
+                          data-name="{{ product.name }}"
+                          data-price="{{ product.price }}"
+                          data-image="{{ product.image }}"
+                          data-site="{{ product.site }}"
+                          data-url="{{ product.url }}"
+                        >
+                          ☆ お気に入り
+                        </button>
 
                       </div>
 
@@ -462,6 +539,31 @@
         </div>
 
       </aside>
+      <!-- お気に入りサイドバー -->
+      <aside id="favorite-sidebar" class="history-sidebar">
+
+        <div class="history-header">
+          <h2>お気に入り</h2>
+
+          <!-- お気に入りをすべて削除するボタン -->
+          <button type="button" id="favorite-clear-button">
+            すべて削除
+          </button>
+
+          <button
+            type="button"
+            id="favorite-close-button"
+            aria-label="お気に入りを閉じる"
+          >
+            ×
+          </button>
+        </div>
+
+        <div id="favorite-list">
+          <p>まだお気に入りはありません。</p>
+        </div>
+
+      </aside>
     </main>
     <!-- サイドバー内用 -->
     <script>
@@ -472,6 +574,38 @@
       const productLinks = document.querySelectorAll(".product-link");
       const historyList = document.getElementById("history-list");
       const historyClearButton = document.getElementById("history-clear-button");
+      // お気に入りボタンをすべて取得
+      const favoriteButtons = document.querySelectorAll(".favorite-button");
+      // お気に入りサイドバー用
+      const favoriteOpenButton = document.getElementById("favorite-open-button");
+      const favoriteCloseButton = document.getElementById("favorite-close-button");
+      const favoriteSidebar = document.getElementById("favorite-sidebar");
+      const favoriteList = document.getElementById("favorite-list");
+      // お気に入り全削除ボタンを取得
+const favoriteClearButton = document.getElementById("favorite-clear-button");
+
+      // 保存済みのお気に入りを確認してボタン表示を変更
+      function updateFavoriteButtons() {
+        const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+
+        favoriteButtons.forEach(function(button) {
+
+          // この商品がお気に入りに入っているか確認
+          const isFavorite = favorites.some(function(item) {
+            return item.url === button.dataset.url;
+          });
+
+          // 登録済みなら黄色い星にする
+          if (isFavorite) {
+            button.textContent = "⭐ お気に入り";
+          } else {
+            button.textContent = "☆ お気に入り";
+          }
+        });
+      }
+
+      // ページを開いた時にお気に入り状態を反映
+      updateFavoriteButtons();
 
       function displayHistory() {
         const history = JSON.parse(sessionStorage.getItem("viewHistory")) || [];
@@ -524,6 +658,95 @@
         });
       }
 
+      // お気に入り一覧を表示
+      function displayFavorites() {
+        const favorites =
+          JSON.parse(localStorage.getItem("favorites")) || [];
+
+        // お気に入りがない場合
+        if (favorites.length === 0) {
+          favoriteList.innerHTML =
+            "<p>まだお気に入りはありません。</p>";
+          return;
+        }
+
+        // 一覧を一度空にする
+        favoriteList.innerHTML = "";
+
+        favorites.forEach(function(product) {
+          const item = document.createElement("div");
+          item.classList.add("history-item");
+
+          // 商品画像
+          const image = document.createElement("img");
+          image.src = product.image;
+          image.alt = product.name;
+          image.width = 80;
+          image.height = 80;
+
+          // 商品名
+          const name = document.createElement("p");
+          name.classList.add("history-title");
+          name.textContent = product.name;
+
+          // 価格
+          const price = document.createElement("p");
+          price.textContent =
+            "¥" + Number(product.price).toLocaleString();
+
+          // 商品サイトへのリンク
+          const siteLink = document.createElement("a");
+          siteLink.textContent = product.site + "へ";
+          siteLink.href = product.url;
+          siteLink.target = "_blank";
+          siteLink.rel = "noopener noreferrer";
+
+          // お気に入り削除ボタン
+          const deleteButton = document.createElement("button");
+          deleteButton.type = "button";
+          deleteButton.textContent = "削除";
+          deleteButton.classList.add("favorite-delete-button");
+
+          // 削除ボタンを押した商品をお気に入りから削除
+          deleteButton.addEventListener("click", function() {
+            let favorites =
+              JSON.parse(localStorage.getItem("favorites")) || [];
+
+            // 押した商品と同じURLの商品を除外
+            favorites = favorites.filter(function(item) {
+              return item.url !== product.url;
+            });
+
+            // 削除後のお気に入りを保存
+            localStorage.setItem("favorites", JSON.stringify(favorites));
+
+            // お気に入り一覧を更新
+            displayFavorites();
+
+            // 検索結果側の星も更新
+            updateFavoriteButtons();
+          });
+
+          const meta = document.createElement("div");
+          meta.classList.add("history-meta");
+
+          const info = document.createElement("div");
+          info.classList.add("history-info");
+
+          meta.appendChild(price);
+          meta.appendChild(siteLink);
+          meta.appendChild(deleteButton);
+
+          info.appendChild(name);
+          info.appendChild(meta);
+
+          item.appendChild(image);
+          item.appendChild(info);
+
+          favoriteList.appendChild(item);
+        });
+      }
+
       productLinks.forEach(function(link) {
         link.addEventListener("click", function() {
           const product = {
@@ -550,9 +773,63 @@
         });
       });
 
+      // お気に入りボタンをクリックした時の処理
+      favoriteButtons.forEach(function(button) {
+        button.addEventListener("click", function() {
+
+          // ボタンが持っている商品情報を取得
+          const product = {
+            name: button.dataset.name,
+            price: button.dataset.price,
+            image: button.dataset.image,
+            site: button.dataset.site,
+            url: button.dataset.url
+          };
+
+          // 取得した商品情報を確認
+          console.log(product);
+
+          // 保存済みのお気に入りを取得
+          let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+
+          // すでにお気に入り登録されているか確認
+          const isFavorite = favorites.some(function(item) {
+            return item.url === product.url;
+          });
+
+          if (isFavorite) {
+            // 登録済みならお気に入りから削除
+            favorites = favorites.filter(function(item) {
+              return item.url !== product.url;
+            });
+
+            button.textContent = "☆ お気に入り";
+
+          } else {
+            // 未登録ならお気に入りに追加
+            favorites.unshift(product);
+
+            // お気に入りは最大100件まで保存
+            favorites = favorites.slice(0, 100);
+
+            button.textContent = "⭐ お気に入り";
+          }
+
+          // お気に入りを保存
+        localStorage.setItem("favorites", JSON.stringify(favorites));
+        });
+      });
+
       historyOpenButton.addEventListener("click", function() {
         displayHistory();
         historySidebar.classList.add("open");
+        historyOverlay.classList.add("open");
+      });
+
+      // お気に入りサイドバーを開く
+      favoriteOpenButton.addEventListener("click", function() {
+        displayFavorites();
+        favoriteSidebar.classList.add("open");
         historyOverlay.classList.add("open");
       });
 
@@ -561,13 +838,36 @@
         displayHistory();
       });
 
+      // お気に入りをすべて削除
+      favoriteClearButton.addEventListener("click", function() {
+
+        // 保存しているお気に入りを削除
+        localStorage.removeItem("favorites");
+
+        // お気に入り一覧を更新
+        displayFavorites();
+
+        // 検索結果側の⭐も☆に戻す
+        updateFavoriteButtons();
+      });
+
       historyCloseButton.addEventListener("click", function() {
         historySidebar.classList.remove("open");
         historyOverlay.classList.remove("open");
       });
 
+      // お気に入りサイドバーを閉じる
+      favoriteCloseButton.addEventListener("click", function() {
+        favoriteSidebar.classList.remove("open");
+        historyOverlay.classList.remove("open");
+      });
+
+      // サイドバーを背景クリックで閉じる
       historyOverlay.addEventListener("click", function() {
+        // 閲覧履歴を閉じる
         historySidebar.classList.remove("open");
+         // お気に入りサイドバーも閉じる
+        favoriteSidebar.classList.remove("open");
         historyOverlay.classList.remove("open");
       });
     </script>

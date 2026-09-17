@@ -49,6 +49,9 @@ def search_serp(keyword, limit=5, sort="price_asc", min_price=None, max_price=No
     # 共通の表示形式に変換
     for item in shopping_results:
 
+        # Google Shoppingの送料情報を取得
+        delivery = item.get("delivery") or ""
+
         serp_results.append({
             "name": item.get("title", ""),
             "price": int(item["extracted_price"]),
@@ -57,6 +60,15 @@ def search_serp(keyword, limit=5, sort="price_asc", min_price=None, max_price=No
             "shop": item.get("source", ""),
             "rating": item.get("rating") or 0,
             "review_count": item.get("reviews") or 0,
+            # Google Shoppingの送料情報をアプリ用に変換
+            "postage": (
+                0 if "送料無料" in delivery
+                else 1 if delivery
+                else None
+            ),
+            # Google Shoppingではポイント情報を取得できない
+            "point_rate": None,
         })
+
     # 指定された件数だけ search.py に返す
     return serp_results[:limit]

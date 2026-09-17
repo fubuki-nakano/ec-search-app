@@ -56,6 +56,10 @@ def search_yahoo(keyword, limit=5, sort="price_asc", min_price=None, max_price=N
         for item in data["hits"]:
             review = item.get("review") or {}
             seller = item.get("seller") or {}
+            # 送料情報を取得
+            shipping = item.get("shipping") or {}
+            # ポイント情報を取得
+            point = item.get("point") or {}
             yahoo_results.append({
                 "name": item["name"],
                 "price": int(item["price"]),
@@ -64,7 +68,18 @@ def search_yahoo(keyword, limit=5, sort="price_asc", min_price=None, max_price=N
                 "shop": seller.get("name", ""),
                 "rating": review.get("rate") or 0,
                 "review_count": review.get("count") or 0,
+                # 同一商品判定に使うJANコード
+                "jan_code": item.get("janCode") or "",
+                # Yahoo!の送料情報をアプリ用に変換
+                "postage": (
+                    0 if shipping.get("code") == 2
+                    else 1 if shipping.get("code") in (1, 3)
+                    else None
+                ),
+                # Yahoo!のポイント倍率
+                "point_rate": point.get("lyLimitedBonusTimes") or 1,
             })
+
                 # 欲しい件数に到達したら商品追加を終了
             if len(yahoo_results) >= limit:
                 break
