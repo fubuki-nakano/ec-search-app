@@ -393,6 +393,57 @@
               {% endfor %}
 
             </div>
+          
+          <!-- 同一商品比較 -->
+          {% elif display_mode == "same_product" %}
+
+            <p>
+              JANコードや型番が一致した同一商品候補を比較しています。
+            </p>
+
+            <!-- 同一商品候補を1グループずつ表示 -->
+            {% for group in same_product_groups %}
+
+              <section class="same-product-group">
+
+                <!-- 判定に使った型番 -->
+                <h3>型番：{{ group.model_code }}</h3>
+
+                <!-- 同じ型番の商品を表示 -->
+                {% for product in group.products %}
+
+                  <div class="same-product-item">
+
+                    <p>{{ product.site }}</p>
+
+                    <p>{{ product.name }}</p>
+
+                    <p class="price">
+                      ¥{{ "{:,}".format(product.price) }}
+                    </p>
+
+                    {% if product.url.startswith(('https://', 'http://')) %}
+                      <a
+                        href="{{ product.url }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        商品ページへ
+                      </a>
+                    {% endif %}
+
+                  </div>
+
+                {% endfor %}
+
+              </section>
+
+            {% endfor %}
+
+            <!-- 同一商品候補が見つからなかった場合 -->
+            {% if not same_product_groups %}
+              <p>同一商品候補は見つかりませんでした。</p>
+            {% endif %}
 
           {% endif %}
           <!-- ページ移動 -->
