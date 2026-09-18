@@ -212,3 +212,75 @@ white-space: nowrap;
     align-items: center;
     gap: 12px;
 }
+
+/* 同一商品比較のグループ */
+.same-product-group {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+gap: 16px;
+margin-bottom: 32px;
+}
+
+/* 型番の見出しは1行全部を使う */
+.same-product-group h3 {
+grid-column: 1 / -1;
+}
+
+/* 同一商品比較の商品カード */
+.same-product-item {
+border: 1px solid #ccc;
+padding: 16px;
+border-radius: 8px;
+}
+
+/* 同一商品比較の商品カード */
+.same-product-item {
+position: relative;
+border: 1px solid #ccc;
+padding: 16px;
+border-radius: 8px;
+}
+
+/* 最安値ラベル */
+.lowest-price-label {
+display: block;
+width: fit-content;
+padding: 4px 8px;
+border: 1px solid #999;
+border-radius: 999px;
+font-weight: bold;
+margin: 0 0 8px 0;
+}
+
+/* 最安値ラベル＋商品カードをまとめる箱 */
+.same-product-wrapper {
+position: relative;
+
+/* 最安値ラベルを置くスペースを全カードで確保 */
+padding-top: 42px;
+}
+
+/* 最安値ラベル */
+.lowest-price-label {
+position: absolute;
+top: 0;
+left: 0;
+
+width: fit-content;
+padding: 4px 8px;
+border: 1px solid #999;
+border-radius: 999px;
+font-weight: bold;
+margin: 0;
+}
+
+/* 同一商品比較の商品名を2行まで表示 */
+.same-product-title {
+display: -webkit-box;
+-webkit-box-orient: vertical;
+-webkit-line-clamp: 2;
+overflow: hidden;
+}
+
+
+

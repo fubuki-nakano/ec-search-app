@@ -63,10 +63,62 @@ def extract_model_codes(product_name):
         has_letter = any(char.isalpha() for char in code)
         has_number = any(char.isdigit() for char in code)
 
-        if has_letter and has_number and len(code) >= 4:
-            model_codes.append(code)
+        # 型番ではない可能性が高い一般的な表記を除外
+        ignore_codes = [
+            "BLUETOOTH",
+        ]
 
+        # IP55・IPX5などの防塵・防水規格は型番から除外
+        if re.fullmatch(r"IPX?\d+", code):
+            continue
+
+        # 256GB・1TBなどの容量表記は型番から除外
+        if re.fullmatch(r"\d+(GB|TB|MB)", code):
+            continue
+
+        if (
+            has_letter
+            and has_number
+            and len(code) >= 4
+            and not any(word in code for word in ignore_codes)
+        ):
+            model_codes.append(code)
+        # 見つかった型番候補をまとめて返す
     return model_codes
+
+# 型番候補の中から、より型番らしいものを1つ選ぶ関数
+def select_best_model_code(product_name):
+    # 商品名から型番候補を取得
+    model_codes = extract_model_codes(product_name)
+
+    # 型番候補がなければ何も返さない
+    if not model_codes:
+        return None
+
+    # 型番らしさを計算
+    def model_score(code):
+        # 英字→数字、数字→英字の切り替わり回数
+        transitions = 0
+
+        for i in range(1, len(code)):
+            if (
+                code[i - 1].isalnum()
+                and code[i].isalnum()
+                and code[i - 1].isalpha() != code[i].isalpha()
+            ):
+                transitions += 1
+
+        # ハイフン付きの型番を少し優先
+        has_hyphen = 1 if "-" in code else 0
+
+        return (
+            transitions,
+            has_hyphen,
+            -len(code),
+        )
+
+    # 一番型番らしい候補を返す
+    return max(model_codes, key=model_score)
 
 # 同一商品比較から除外するアクセサリー商品を判定
 def is_accessory_product(product_name):
@@ -243,15 +295,23 @@ def index():
 
                 # 全商品を1件ずつ確認
                 for product in all_products:
-                    # 商品名から型番候補を取得
-                    model_codes = set(extract_model_codes(product["name"]))
+                    # 商品名から一番型番らしい候補を1つ取得
+                    model_code = select_best_model_code(product["name"])
 
-                    # 見つかった型番ごとに商品をまとめる
-                    for model_code in model_codes:
+                    # 型番候補がない商品は今回はまとめない
+                    if not model_code:
+                        continue
 
-                        # 初めて出てきた型番なら空のリストを作る
-                        if model_code not in model_groups:
-                            model_groups[model_code] = []
+                    # 初めて出てきた型番なら空のリストを作る
+                    if model_code not in model_groups:
+                        model_groups[model_code] = []
+
+                    # 同じ型番の商品を追加
+                    model_groups[model_code].append(product)
+
+                    # 初めて出てきた型番なら空のリストを作る
+                    if model_code not in model_groups:
+                        model_groups[model_code] = []
 
                         model_groups[model_code].append(product)
                     # 2サイト以上に存在する型番だけ同一商品候補にする
@@ -263,28 +323,17 @@ def index():
                         for product in group
                     }
 
-                    # 楽天＋Yahoo!など、2サイト以上にあれば比較対象にする
-                    if len(group_sites) >= 2:
-                        same_product_groups.append({
-                            "model_code": model_code,
-                            "products": group,
-                        })
-                print("同一商品候補グループ数:", len(same_product_groups))
+                    # 型番一致の同一商品候補を追加
+                    same_product_groups.append({
+                        "match_type": "型番",
+                        "match_value": model_code,
+                        "products": group,
+                    })
 
-                # 型番候補の確認用（最初の10商品だけ）
-                for product in all_products[:10]:
-                    model_codes = extract_model_codes(product["name"])
+                # JANコードで同一商品と判定できた商品のURLを記録
+                jan_matched_urls = set()
 
-                    if model_codes:
-                        print(
-                            "サイト:", product["site"],
-                            "型番候補:", model_codes,
-                            "商品名:", product["name"]
-                        )
-
-                # 取得件数の確認用
-                print("同一商品比較用の商品数:", len(all_products))
-                    # JANコードごとに商品をまとめる
+                # JANコードごとに商品をまとめる
                 jan_groups = {}
 
                 for product in all_products:
@@ -301,20 +350,54 @@ def index():
                     # 同じJANコードの商品を追加
                     jan_groups[jan_code].append(product)
 
-                # 2件以上あるJANコードだけ確認
+                # 2サイト以上に存在するJANコードだけ同一商品候補にする
                 for jan_code, group in jan_groups.items():
-                    if len(group) >= 2:
-                        # このグループに含まれるサイト名を確認
-                        sites = {product["site"] for product in group}
 
-                        print(
-                            "同一JAN:",
-                            jan_code,
-                            "商品数:",
-                            len(group),
-                            "サイト:",
-                            sites
+                    # このJANコードの商品が存在するサイトを取得
+                    group_sites = {
+                        product["site"]
+                        for product in group
+                    }
+
+                    # 楽天＋Yahoo!など、2サイト以上にあれば比較対象にする
+                    if len(group_sites) >= 2:
+                        # 同じ商品の中を価格の安い順に並べる
+                        group = sorted(
+                            group,
+                            key=lambda product: product["price"]
                         )
+                        same_product_groups.append({
+                            "match_type": "JANコード",
+                            "match_value": jan_code,
+                            "products": group,
+                        })
+                        # JAN一致した商品を記録
+                        for product in group:
+                            jan_matched_urls.add(product["url"])
+                # JAN一致した商品がある場合は、重複する型番グループを除外
+                same_product_groups = [
+                    group
+                    for group in same_product_groups
+                    if (
+                        group["match_type"] == "JANコード"
+                        or not any(
+                            product["url"] in jan_matched_urls
+                            for product in group["products"]
+                        )
+                    )
+                ]
+                # 比較できるサイト数が多いグループを上に表示
+                # サイト数が同じ場合は、商品件数が多いグループを優先
+                same_product_groups.sort(
+                    key=lambda group: (
+                        len({
+                            product["site"]
+                            for product in group["products"]
+                        }),
+                        len(group["products"]),
+                    ),
+                    reverse=True
+                )
 
     # APIから帰ってきた情報をHTMLへ渡す
     return render_template(

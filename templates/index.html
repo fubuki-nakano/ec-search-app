@@ -399,6 +399,8 @@
 
             <p>
               JANコードや型番が一致した同一商品候補を比較しています。
+              商品名から自動判定しているため、異なる商品が含まれる場合があります。
+              必要に応じて除外キーワードで検索結果を絞り込んでください。
             </p>
 
             <!-- 同一商品候補を1グループずつ表示 -->
@@ -406,20 +408,82 @@
 
               <section class="same-product-group">
 
-                <!-- 判定に使った型番 -->
-                <h3>型番：{{ group.model_code }}</h3>
-
+                <!-- 同一商品候補の判定情報と商品件数 -->
+                <h3>
+                  {{ group.match_type }}：{{ group.match_value }}
+                  　商品：{{ group.products|length }}件
+                </h3>
                 <!-- 同じ型番の商品を表示 -->
                 {% for product in group.products %}
 
-                  <div class="same-product-item">
+                  <!-- 最安値ラベルと商品カードをまとめる -->
+                  <div class="same-product-wrapper">
+
+                    <!-- グループ内で一番安い商品に最安値を表示 -->
+                    {% if loop.first %}
+                      <p class="lowest-price-label">最安値</p>
+                    {% endif %}
+
+                    <div class="same-product-item">
+
+                      <!-- 商品画像 -->
+                  {% if product.image.startswith(('https://', 'http://')) %}
+                    <img
+                      src="{{ product.image }}"
+                      alt="{{ product.name }}"
+                      loading="lazy"
+                      width="100"
+                      height="100"
+                    >
+                  {% endif %}
 
                     <p>{{ product.site }}</p>
 
-                    <p>{{ product.name }}</p>
+                    <!-- ショップ名 -->
+                    <p>{{ product.shop }}</p>
+
+                    <!-- 商品名は2行まで表示し、ホバー時に全文を確認 -->
+                    <p
+                      class="same-product-title"
+                      title="{{ product.name }}"
+                    >
+                      {{ product.name }}
+                    </p>
+
+                    <!-- 評価とレビュー件数 -->
+                    <p class="rating-row">
+                      <span
+                        class="star-rating"
+                        style="--rating-percent: {{ product.rating / 5 * 100 }}%;"
+                      >
+                        ★★★★★
+                      </span>
+
+                      {{ product.rating }}（{{ product.review_count }}件）
+                    </p>
 
                     <p class="price">
                       ¥{{ "{:,}".format(product.price) }}
+                    </p>
+
+                    <!-- 送料情報 -->
+                    <p>
+                      {% if product.postage == 0 %}
+                        送料込み
+                      {% elif product.postage == 1 %}
+                        送料別
+                      {% else %}
+                        送料：－
+                      {% endif %}
+                    </p>
+
+                    <!-- ポイント倍率 -->
+                    <p>
+                      {% if product.point_rate %}
+                        ポイント：{{ "{:g}".format(product.point_rate) }}倍
+                      {% else %}
+                        ポイント：－
+                      {% endif %}
                     </p>
 
                     {% if product.url.startswith(('https://', 'http://')) %}
@@ -431,6 +495,21 @@
                         商品ページへ
                       </a>
                     {% endif %}
+
+                    <!-- 同一商品比較用のお気に入りボタン -->
+                    <button
+                      type="button"
+                      class="favorite-button"
+                      data-name="{{ product.name }}"
+                      data-price="{{ product.price }}"
+                      data-image="{{ product.image }}"
+                      data-site="{{ product.site }}"
+                      data-url="{{ product.url }}"
+                    >
+                      ☆ お気に入り
+                    </button>
+
+                    </div>
 
                   </div>
 
@@ -633,7 +712,7 @@
       const favoriteSidebar = document.getElementById("favorite-sidebar");
       const favoriteList = document.getElementById("favorite-list");
       // お気に入り全削除ボタンを取得
-const favoriteClearButton = document.getElementById("favorite-clear-button");
+      const favoriteClearButton = document.getElementById("favorite-clear-button");
 
       // 保存済みのお気に入りを確認してボタン表示を変更
       function updateFavoriteButtons() {
