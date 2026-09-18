@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 load_dotenv()
 application_id = os.getenv("RAKUTEN_APPLICATION_ID")
 access_key = os.getenv("RAKUTEN_ACCESS_KEY")
+# 楽天アフィリエイトIDを取得
+affiliate_id = os.getenv("RAKUTEN_AFFILIATE_ID")
 # APIの接続先
 url = "https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20260701"
 
@@ -30,6 +32,9 @@ def search_rakuten(keyword, limit=5, sort="price_asc", min_price=None, max_price
         "hits": hits,
         "page": page,
     }
+    # アフィリエイトIDが設定されていれば楽天APIへ渡す
+    if affiliate_id:
+        params["affiliateId"] = affiliate_id
 
     # 並び順が指定されている場合だけ楽天APIへ渡す
     if sort is not None:
@@ -68,6 +73,7 @@ def search_rakuten(keyword, limit=5, sort="price_asc", min_price=None, max_price
         for item_list in data["Items"]:
             # 実際の商品情報部分を取り出し
             item = item_list["Item"]
+
             # 商品画像の一覧を取得
             images = item.get("mediumImageUrls") or []
             # 楽天の項目名を、このアプリの形式に変換
