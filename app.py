@@ -40,7 +40,7 @@ SEARCH_MODES = {
 # 表示方法の指定
 DISPLAY_MODES = {
     "compare": "サイト別比較",
-    "list": "価格順一覧",
+    "list": "商品一覧",
     # JANコード・型番などが一致する商品をまとめて比較
     "same_product": "同一商品比較",
 }
@@ -167,6 +167,8 @@ def index():
     search_mode = request.args.get("search_mode", "standard")
     # 表示方法
     display_mode = request.args.get("display_mode", "list")
+    # 検索結果を表示するサイトの絞り込み
+    result_site = request.args.get("result_site", "all")
     # 価格上限下限の設定
     min_price_text = request.args.get("min_price", "").strip()
     max_price_text = request.args.get("max_price", "").strip()
@@ -203,6 +205,9 @@ def index():
         # 表示方法の確認
         if display_mode not in DISPLAY_MODES:
             errors.append("表示方法を選択肢から選んでください。")
+        # 検索結果のサイト絞り込みを確認
+        if result_site != "all" and result_site not in selected:
+            errors.append("表示するサイトを選択肢から選んでください。")
         # 検索精度の確認
         if search_mode not in SEARCH_MODES:
             errors.append("検索精度を選択肢から選んでください。")
@@ -240,20 +245,50 @@ def index():
             page_size = int(limit)
             # DBに保存されている検索結果の総件数
             total_products = count_results(search_id)
-            # 価格順一覧
+            # 商品一覧
             if display_mode == "list":
-                # 全商品の件数から総ページ数を計算
+
+                # 絞り込み用のサイト名
+                site_name = ""
+
+                # 全サイトを表示する場合
+                if result_site == "all":
+                    total_products = count_results(search_id)
+
+                # 特定のサイトだけ表示する場合
+                else:
+                    site_name = SITES[result_site]["name"]
+
+                    total_products = count_results_by_site(
+                        search_id,
+                        site_name,
+                    )
+
+                # 絞り込み後の商品件数から総ページ数を計算
                 total_pages = (total_products + page_size - 1) // page_size
+
                 # ページ番号が最大ページを超えていたら最後のページにする
                 if total_pages > 0 and page > total_pages:
                     page = total_pages
-                # 現在のページ分だけDBから取得
-                products = get_results_page(
-                    search_id,
-                    page,
-                    page_size,
-                    sort,
-                )
+
+                # 全サイトの商品を取得
+                if result_site == "all":
+                    products = get_results_page(
+                        search_id,
+                        page,
+                        page_size,
+                        sort,
+                    )
+
+                # 指定サイトの商品だけ取得
+                else:
+                    products = get_results_by_site(
+                        search_id,
+                        site_name,
+                        page,
+                        page_size,
+                        sort,
+                    )
             # サイト別比較
             elif display_mode == "compare":
                 # サイトごとのページ数を入れる
@@ -414,6 +449,7 @@ def index():
         sort=sort,
         search_mode=search_mode,
         display_mode=display_mode,
+        result_site=result_site,
         min_price_text=min_price_text,
         max_price_text=max_price_text,
         products=products,

@@ -145,6 +145,35 @@
       {% if searched %}
         <!--件数を表示-->
         <h2>検索結果：全{{ total_products }}件</h2>
+        <!-- 商品一覧のサイト絞り込み -->
+        {% if display_mode == "list" and search_id %}
+          <label for="result_site">表示サイト</label>
+
+          <select
+            id="result_site"
+            onchange="
+              const siteParams = new URLSearchParams(window.location.search);
+              siteParams.set('result_site', this.value);
+              siteParams.set('page', '1');
+              window.location.search = siteParams.toString();
+            "
+          >
+            <option value="all" {% if result_site == "all" %}selected{% endif %}>
+              すべて
+            </option>
+
+            {% for id, site in sites.items() %}
+              {% if id in selected %}
+                <option
+                  value="{{ id }}"
+                  {% if result_site == id %}selected{% endif %}
+                >
+                  {{ site.name }}
+                </option>
+              {% endif %}
+            {% endfor %}
+          </select>
+        {% endif %}
         <!-- 検索結果がある場合 -->
         {% if total_products > 0 %}
 
@@ -541,6 +570,7 @@
                   exclude_keywords=exclude_keywords_text,
                   search_mode=search_mode,
                   display_mode=display_mode,
+                  result_site=result_site,
                   search_id=search_id,
                   page=page - 1
                 ) }}">← 前へ</a>
@@ -573,6 +603,7 @@
                       <input type="hidden" name="exclude_keywords" value="{{ exclude_keywords_text }}">
                       <input type="hidden" name="search_mode" value="{{ search_mode }}">
                       <input type="hidden" name="display_mode" value="{{ display_mode }}">
+                      <input type="hidden" name="result_site" value="{{ result_site }}">
                       <input type="hidden" name="search_id" value="{{ search_id }}">
 
                       <input
@@ -599,6 +630,7 @@
                       exclude_keywords=exclude_keywords_text,
                       search_mode=search_mode,
                       display_mode=display_mode,
+                      result_site=result_site,
                       search_id=search_id,
                       page=p
                     ) }}">{{ p }}</a>
@@ -629,6 +661,7 @@
                   exclude_keywords=exclude_keywords_text,
                   search_mode=search_mode,
                   display_mode=display_mode,
+                  result_site=result_site,
                   search_id=search_id,
                   page=page + 1
                 ) }}">次へ →</a>
