@@ -11,140 +11,427 @@
   </head>
   <body>
     <main>
-      <h1>商品比較検索</h1>
-      <!-- 閲覧履歴を開くボタン -->
-      <button type="button" id="history-open-button">
-        閲覧履歴
-      </button> 
-      <!-- お気に入り一覧を開くボタン -->
-      <button type="button" id="favorite-open-button">
-        お気に入り
-      </button>
+    <h1>商品比較検索</h1>
 
-      <!-- getでapp.pyへ -->
-      <form method="get" action="/">
-        <fieldset>
-          <legend>検索対象サイト（複数選択可）</legend>
-          <!--app.py から渡された sites を順番に処理-->
-          {% for id, site in sites.items() %}
-            <!--サイト指定チェックボックス-->
-            <label><input type="checkbox" name="sites" value="{{ id }}" {% if id in selected %}checked{% endif %}> {{ site.name }}</label>
-          {% endfor %}
-        </fieldset>
-        <label for="keyword">商品名</label>
-        <input id="keyword" name="keyword" type="search" value="{{ keyword }}" maxlength="128" required placeholder="例：イヤホン">
-        <!-- 除外キーワード -->
-        <label for="exclude_keywords">除外キーワード</label>
-        <input
-          id="exclude_keywords"
-          name="exclude_keywords"
-          type="text"
-          value="{{ exclude_keywords_text }}"
-          maxlength="128"
-          placeholder="例：ケース カバー スタンド"
-        >
+    <!-- メイン検索フォーム -->
+    <form id="search-form" method="get" action="/">
 
-        <!--最低価格の指定-->
-        <label for="min_price">最低価格</label>
-        <input
-          id="min_price"
-          name="min_price"
-          type="number"
-          min="0"
-          value="{{ min_price_text }}"
-          list="price_options"
-          placeholder="指定なし"
-        >
+      <!-- 1段目：商品検索 -->
+      <div class="search-main-row">
 
-        <span>〜</span>
-        <!-- 最高価格の指定 -->
-        <label for="max_price">最高価格</label>
-        <input
-          id="max_price"
-          name="max_price"
-          type="number"
-          min="0"
-          value="{{ max_price_text }}"
-          list="price_options"
-          placeholder="指定なし"
+        <!-- サイト名 -->
+        <div class="site-brand">
+
+          <!-- 仮のサイトアイコン -->
+          <div class="site-brand-icon">
+            <span class="brand-search-icon"></span>
+          </div>
+
+          <span class="site-brand-name">
+            商品比較検索
+          </span>
+
+        </div>
+
+        <!-- 検索窓と検索ボタン -->
+        <div class="keyword-search-box">
+
+          <input
+            id="keyword"
+            name="keyword"
+            type="search"
+            value="{{ keyword }}"
+            maxlength="128"
+            required
+            placeholder="商品名を入力　例：ワイヤレスイヤホン"
+          >
+
+          <button
+            type="submit"
+            class="main-search-button"
+            aria-label="検索"
+            title="検索"
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#222"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="11" cy="11" r="7"></circle>
+              <line x1="16" y1="16" x2="21" y2="21"></line>
+            </svg>
+          </button>
+
+        </div>
+
+                <button
+          type="button"
+          id="history-open-button"
+          class="top-option-button"
         >
-        <!-- 表示件数 -->
-        <datalist id="price_options">
-          <option value="5000">
-          <option value="10000">
-          <option value="20000">
-          <option value="30000">
-          <option value="50000">
-          <option value="100000">
-          <option value="200000">
-          <option value="500000">
-        </datalist>
-        <label for="limit">1ページの表示件数</label>
-        <select
-          id="limit"
-          name="limit"
-          {% if search_id %}
-            onchange="
-              const params = new URLSearchParams(window.location.search);
-              params.set('search_id', '{{ search_id }}');
-              params.set('limit', this.value);
-              params.set('page', '1');
-              window.location.search = params.toString();
-            "
-          {% endif %}
+          👓 閲覧履歴
+        </button>
+
+        <button
+          type="button"
+          id="favorite-open-button"
+          class="top-option-button"
         >
-          {% for value in limits %}
-            <option value="{{ value }}" {% if value|string == limit %}selected{% endif %}>
-              {{ value }}件
-            </option>
-          {% endfor %}
-        </select>
-        <!-- 検索精度 -->
-        <label for="search_mode">検索精度</label>
-        <select id="search_mode" name="search_mode">
-          {% for value, label in search_modes.items() %}
-            <option value="{{ value }}" {% if value == search_mode %}selected{% endif %}>
-              {{ label }}
-            </option>
-          {% endfor %}
-        </select>
-        <!-- 表示方法 -->
-        <label for="display_mode">表示方法</label>
-        <select
-          id="display_mode"
-          name="display_mode"
-          {% if search_id %}
-            onchange="
-              const displayParams = new URLSearchParams(window.location.search);
-              displayParams.set('search_id', '{{ search_id }}');
-              displayParams.set('display_mode', this.value);
-              displayParams.set('page', '1');
-              window.location.search = displayParams.toString();
-            "
-          {% endif %}
-        >
-          {% for value, label in display_modes.items() %}
-            <option value="{{ value }}" {% if value == display_mode %}selected{% endif %}>
-              {{ label }}
-            </option>
-          {% endfor %}
-        </select>
-        <!-- 並び順 -->
-        <label for="sort">並び順</label>
-        <select id="sort" name="sort">
-          {% for value, label in sorts.items() %}
-            <option value="{{ value }}" {% if value == sort %}selected{% endif %}>{{ label }}</option>
-          {% endfor %}
-        </select>
-        <!-- 検索 -->
-        <button type="submit">検索</button>
-      </form>
+          ⭐ お気に入り
+        </button>
+
+      </div>
+
+
+      <!-- 検索サイトと表示設定 -->
+      <div class="search-settings-row">
+
+        <!-- 左側：検索対象サイト -->
+        <div class="site-settings-block">
+
+          <!-- 選択中サイトの枠とサイト選択ボタン -->
+          <div class="selected-sites-row">
+
+            <fieldset class="selected-sites-fieldset">
+
+              <legend>選択中のサイト</legend>
+
+              <div id="selected-sites" class="selected-sites">
+
+                {% for id, site in sites.items() %}
+                  {% if id in selected %}
+                    <span class="selected-site">
+                      ・{{ site.name }}
+                    </span>
+                  {% endif %}
+                {% endfor %}
+
+              </div>
+
+            </fieldset>
+
+
+            <!-- 検索サイトを選ぶ -->
+            <details class="site-select-details">
+
+              <summary>
+                検索サイトを選ぶ
+              </summary>
+
+              <div class="site-select-options">
+
+                <label>
+                  <input
+                    type="checkbox"
+                    id="site-all-checkbox"
+                  >
+                  すべて
+                </label>
+
+                {% for id, site in sites.items() %}
+
+                  <label>
+                    <input
+                      type="checkbox"
+                      class="site-checkbox"
+                      name="sites"
+                      value="{{ id }}"
+                      data-site-name="{{ site.name }}"
+                      {% if id in selected %}checked{% endif %}
+                    >
+                    {{ site.name }}
+                  </label>
+
+                {% endfor %}
+
+              </div>
+
+            </details>
+
+          </div>
+
+        </div>
+
+
+
+
+        <!-- 右側：表示設定 -->
+        <div class="display-settings-block">
+
+
+          <div class="search-option-row">
+
+            <!-- 表示方法 -->
+            <div class="search-option-item">
+
+              <label for="display_mode">表示方法</label>
+
+              <select
+                id="display_mode"
+                name="display_mode"
+                {% if search_id %}
+                  onchange="
+                    const displayParams =
+                      new URLSearchParams(window.location.search);
+
+                    displayParams.set(
+                      'search_id',
+                      '{{ search_id }}'
+                    );
+
+                    displayParams.set(
+                      'display_mode',
+                      this.value
+                    );
+
+                    displayParams.set('page', '1');
+
+                    window.location.search =
+                      displayParams.toString();
+                  "
+                {% endif %}
+              >
+                {% for value, label in display_modes.items() %}
+                  <option
+                    value="{{ value }}"
+                    {% if value == display_mode %}selected{% endif %}
+                  >
+                    {{ label }}
+                  </option>
+                {% endfor %}
+              </select>
+
+            </div>
+
+
+            <!-- 並び順 -->
+            <div class="search-option-item">
+
+              <label for="sort">並び順</label>
+
+              <select
+                id="sort"
+                name="sort"
+              >
+                {% for value, label in sorts.items() %}
+                  <option
+                    value="{{ value }}"
+                    {% if value == sort %}selected{% endif %}
+                  >
+                    {{ label }}
+                  </option>
+                {% endfor %}
+              </select>
+
+            </div>
+
+
+            <!-- 表示件数 -->
+            <div class="search-option-item">
+
+              <label for="limit">表示件数</label>
+
+              <select
+                id="limit"
+                name="limit"
+                {% if search_id %}
+                  onchange="
+                    const params =
+                      new URLSearchParams(window.location.search);
+
+                    params.set(
+                      'search_id',
+                      '{{ search_id }}'
+                    );
+
+                    params.set(
+                      'limit',
+                      this.value
+                    );
+
+                    params.set('page', '1');
+
+                    window.location.search =
+                      params.toString();
+                  "
+                {% endif %}
+              >
+                {% for value in limits %}
+                  <option
+                    value="{{ value }}"
+                    {% if value|string == limit %}selected{% endif %}
+                  >
+                    {{ value }}件
+                  </option>
+                {% endfor %}
+              </select>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </form>
+
+      <!-- 絞り込みと検索結果を左右に分ける -->
+      <div class="content-layout">
+
+        <!-- 左側：絞り込み -->
+        <aside class="filter-sidebar">
+
+          <h2>絞り込み</h2>
+
+          <!-- 絞り込み専用フォーム -->
+          <form id="filter-form" method="get" action="/">
+
+            <!-- 今検索している商品名を引き継ぐ -->
+            <input
+              type="hidden"
+              name="keyword"
+              value="{{ keyword }}"
+            >
+
+            <!-- 今選択している検索サイトを引き継ぐ -->
+            {% for site in selected %}
+              <input
+                type="hidden"
+                name="sites"
+                value="{{ site }}"
+              >
+            {% endfor %}
+
+            <!-- 現在の表示方法を引き継ぐ -->
+            <input
+              type="hidden"
+              name="display_mode"
+              value="{{ display_mode }}"
+            >
+
+            <!-- 現在の並び順を引き継ぐ -->
+            <input
+              type="hidden"
+              name="sort"
+              value="{{ sort }}"
+            >
+
+            <!-- 現在の表示件数を引き継ぐ -->
+            <input
+              type="hidden"
+              name="limit"
+              value="{{ limit }}"
+            >
+
+
+            <!-- 除外キーワード -->
+            <label for="exclude_keywords">除外キーワード</label>
+
+            <input
+              id="exclude_keywords"
+              name="exclude_keywords"
+              type="text"
+              value="{{ exclude_keywords_text }}"
+              maxlength="128"
+              placeholder="例：ケース カバー スタンド"
+            >
+
+
+            <!-- 価格帯 -->
+            <div class="filter-price">
+
+              <label>価格</label>
+
+              <div class="price-range-row">
+
+                <div class="price-input-wrap">
+                  <input
+                    id="min_price"
+                    name="min_price"
+                    type="number"
+                    min="0"
+                    value="{{ min_price_text }}"
+                    placeholder="最低価格"
+                  >
+                  <span class="price-unit">円</span>
+                </div>
+
+                <div class="price-max-group">
+
+                  <span class="price-separator">〜</span>
+
+                  <div class="price-input-wrap">
+                    <input
+                      id="max_price"
+                      name="max_price"
+                      type="number"
+                      min="0"
+                      value="{{ max_price_text }}"
+                      placeholder="最高価格"
+                    >
+                    <span class="price-unit">円</span>
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <!-- 検索精度 -->
+            <div class="filter-search-mode">
+
+              <label for="search_mode">検索精度</label>
+
+              <select
+                id="search_mode"
+                name="search_mode"
+              >
+                {% for value, label in search_modes.items() %}
+                  <option
+                    value="{{ value }}"
+                    {% if value == search_mode %}selected{% endif %}
+                  >
+                    {{ label }}
+                  </option>
+                {% endfor %}
+              </select>
+
+            </div>
+
+
+            <!-- 絞り込みを実行 -->
+            <button
+              type="submit"
+              class="filter-submit-button"
+            >
+              絞り込む
+            </button>
+
+          </form>
+
+        </aside>
+
+
+
+        <!-- 右側：検索結果 -->
+        <section class="result-area">
+
       <!--エラー発生時の表示-->
       {% for error in errors %}<p class="error" role="alert">{{ error }}</p>{% endfor %}
       <!--検索した後かどうか-->
-      {% if searched %}
-        <!--件数を表示-->
+{% if searched %}
+
         <h2>検索結果：全{{ total_products }}件</h2>
+
         <!-- 商品一覧のサイト絞り込み -->
         {% if display_mode == "list" and search_id %}
           <label for="result_site">表示サイト</label>
@@ -672,6 +959,9 @@
         <!-- エラー以外で検索結果が０の時 -->
         {% elif not errors %}<p>該当する商品がありません。商品名を変えて検索してください。</p>{% endif %}
       {% else %}<p>サイトを選び、商品名を入力して検索してください。</p>{% endif %}
+        </section>
+
+      </div>
       <footer>
         <a href="https://webservice.rakuten.co.jp/">Supported by 楽天ウェブサービス</a>
         / <a href="https://developer.yahoo.co.jp/sitemap/">Webサービス by Yahoo! JAPAN</a>
@@ -746,6 +1036,73 @@
       const favoriteList = document.getElementById("favorite-list");
       // お気に入り全削除ボタンを取得
       const favoriteClearButton = document.getElementById("favorite-clear-button");
+      // 検索サイト選択用
+      const siteCheckboxes = document.querySelectorAll(".site-checkbox");
+      const selectedSitesArea = document.getElementById("selected-sites");
+      // 「すべて」チェックボックス
+      const siteAllCheckbox = document.getElementById("site-all-checkbox");
+      // 検索サイト選択タブ
+      const siteSelectDetails =document.querySelector(".site-select-details");
+
+      // 「すべて」を変更したら、全サイトを同じ状態にする
+      siteAllCheckbox.addEventListener("change", function() {
+
+          siteCheckboxes.forEach(function(checkbox) {
+
+              checkbox.checked = siteAllCheckbox.checked;
+
+          });
+
+          // 上側の選択サイト表示も更新
+          updateSelectedSites();
+      });
+
+      // 選択中の検索サイトを上側に表示する
+      function updateSelectedSites() {
+
+          selectedSitesArea.innerHTML = "";
+
+          siteCheckboxes.forEach(function(checkbox) {
+
+              // チェックされているサイトだけ表示
+              if (checkbox.checked) {
+
+                  const siteName = document.createElement("span");
+
+                  siteName.classList.add("selected-site");
+
+                  siteName.textContent =
+                      "・" + checkbox.dataset.siteName;
+
+                  selectedSitesArea.appendChild(siteName);
+              }
+          });
+      }
+
+      // チェックを変更したら表示も更新する
+      siteCheckboxes.forEach(function(checkbox) {
+
+          checkbox.addEventListener("change", function() {
+
+              // 選択中サイト表示を更新
+              updateSelectedSites();
+
+              // 全サイトにチェックがあれば「すべて」もチェック
+              const allChecked =
+                  Array.from(siteCheckboxes).every(function(siteCheckbox) {
+                      return siteCheckbox.checked;
+                  });
+
+              siteAllCheckbox.checked = allChecked;
+
+          });
+      });
+
+      // ページを開いた時の「すべて」の状態
+      siteAllCheckbox.checked =
+          Array.from(siteCheckboxes).every(function(checkbox) {
+              return checkbox.checked;
+          });
 
       // 保存済みのお気に入りを確認してボタン表示を変更
       function updateFavoriteButtons() {
@@ -1024,6 +1381,59 @@
         favoriteSidebar.classList.remove("open");
         historyOverlay.classList.remove("open");
       });
+
+      // 検索サイト選択タブの外側をクリックしたら閉じる
+      document.addEventListener("click", function(event) {
+
+          // タブの中をクリックした場合は閉じない
+          if (siteSelectDetails.contains(event.target)) {
+              return;
+          }
+
+          // タブの外側なら閉じる
+          siteSelectDetails.removeAttribute("open");
+      });
+
+      // 絞り込みフォーム
+      const filterForm = document.getElementById("filter-form");
+
+      // 絞り込み欄ではEnterキーで送信しない
+      filterForm.addEventListener("keydown", function(event) {
+
+          if (
+              event.key === "Enter" &&
+              event.target.tagName === "INPUT"
+          ) {
+              event.preventDefault();
+          }
+
+      });
+
+      // 価格の桁数に合わせて入力欄の幅を変更
+      const priceInputs =
+          document.querySelectorAll(".price-input-wrap input");
+
+      // 入力した桁数に合わせて数字部分だけ横幅を変更
+      function updatePriceInputWidth(input) {
+
+          const length = Math.max(input.value.length, 4);
+
+          input.style.width = `calc(${length}ch + 4px)`;
+      }
+
+      // ページを開いた時と、数字を入力した時に幅を調整
+      priceInputs.forEach(function(input) {
+
+          // 最初の表示時
+          updatePriceInputWidth(input);
+
+          // 入力するたびに更新
+          input.addEventListener("input", function() {
+              updatePriceInputWidth(input);
+          });
+
+      });
+
 
       // サイドバーを背景クリックで閉じる
       historyOverlay.addEventListener("click", function() {

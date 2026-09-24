@@ -162,11 +162,12 @@ def index():
     limit = request.args.get("limit", "10")
     page_text = request.args.get("page", "1")
     page = int(page_text) if page_text.isdigit() and int(page_text) >= 1 else 1
-    sort = request.args.get("sort", "price_asc")
+    # 並び順の初期値は「おすすめ順」
+    sort = request.args.get("sort", "recommend_desc")
     # 検索精度
     search_mode = request.args.get("search_mode", "standard")
-    # 表示方法
-    display_mode = request.args.get("display_mode", "list")
+    # 表示方法の初期値は「サイト別比較」
+    display_mode = request.args.get("display_mode", "compare")
     # 検索結果を表示するサイトの絞り込み
     result_site = request.args.get("result_site", "all")
     # 価格上限下限の設定
@@ -471,6 +472,7 @@ if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000)
 
 # 実行後　http://127.0.0.1:5000 をブラウザに入力
+
 
 
 

@@ -282,5 +282,956 @@ display: -webkit-box;
 overflow: hidden;
 }
 
+/* メイン検索欄 */
+.main-search-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+/* メイン検索欄 */
+.main-search-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0;
+
+    /* 検索欄だけで1行使う */
+    flex: 0 0 100%;
+    box-sizing: border-box;
+}
+
+/* 検索ボタン */
+.main-search-button {
+    height: 46px;
+    padding: 0 24px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* 選択中サイトの表示位置を固定 */
+.selected-sites {
+    min-height: 30px;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* 検索サイト選択タブ */
+.site-select-details {
+    position: relative;
+    display: inline-block;
+}
+
+/* 「検索サイトを選ぶ」ボタン部分 */
+.site-select-details summary {
+    display: inline-block;
+    padding: 8px 14px;
+    border: 1px solid #999;
+    border-radius: 6px;
+    background-color: white;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* 標準の三角マークを消す */
+.site-select-details summary {
+    list-style: none;
+}
+
+.site-select-details summary::-webkit-details-marker {
+    display: none;
+}
+
+/* 閉じている時の矢印 */
+.site-select-details summary::after {
+    content: " ▼";
+    font-size: 12px;
+}
+
+/* 開いている時の矢印 */
+.site-select-details[open] summary::after {
+    content: " ▲";
+}
+
+/* 開いた時に表示するサイト一覧 */
+.site-select-options {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+
+    min-width: 260px;
+    padding: 10px 12px;
+
+    background-color: white;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+    z-index: 1000;
+}
+
+/* サイトを縦に並べる */
+.site-select-options label {
+    display: block;
+    padding: 6px 4px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* 選択中サイトとサイト選択ボタンを横並びにする */
+.site-select-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* 選択サイトが減ってもボタンの位置を動かさない */
+.selected-sites {
+    min-width: 520px;
+}
+
+/* 絞り込みと検索結果の2カラム */
+.content-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 30px;
+    align-items: start;
+    margin-top: 24px;
+}
+
+/* 左側の絞り込み */
+.filter-sidebar {
+    padding: 20px;
+    border-right: 1px solid #ddd;
+}
+
+/* 絞り込みタイトル */
+.filter-sidebar h2 {
+    margin-top: 0;
+}
+
+/* 右側の検索結果 */
+.result-area {
+    min-width: 0;
+}
+
+/* ページ全体を画面幅いっぱいに使う */
+main {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 24px 32px;
+    box-sizing: border-box;
+}
+
+/* 最低価格と最高価格 */
+.price-range-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+/* ～ と最高価格をセットにする */
+.price-max-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 入力欄本体 */
+.price-input-wrap {
+    display: flex;
+    align-items: center;
+
+    border: 1px solid #999;
+    background-color: white;
+
+    padding: 0 8px;
+    height: 48px;
+    box-sizing: border-box;
+}
+
+/* 数字を入力する部分 */
+.price-input-wrap input {
+    width: 5ch;
+    min-width: 4ch;
+
+    border: none;
+    outline: none;
+
+    padding: 0;
+    margin: 0;
+
+    font: inherit;
+    background: transparent;
+}
+
+/* 数字のすぐ後ろに円を表示 */
+.price-unit {
+    margin: 0;
+    padding: 0;
+    white-space: nowrap;
+}
+
+/* ～ */
+.price-separator {
+    white-space: nowrap;
+}
+
+/* 数値入力の上下矢印を消す */
+.price-input-wrap input[type="number"]::-webkit-outer-spin-button,
+.price-input-wrap input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.price-input-wrap input[type="number"] {
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+/* 検索精度 */
+.filter-search-mode {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 16px;
+}
+
+/* 検索精度の選択欄 */
+.filter-search-mode select {
+    width: 100%;
+    height: 44px;
+    box-sizing: border-box;
+    padding: 0 10px;
+    font-size: 16px;
+}
+
+/* 検索結果上部 */
+.result-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+/* 検索結果件数 */
+.result-toolbar h2 {
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* 表示設定を横並び */
+.result-toolbar-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+/* ラベルと選択欄を横並び */
+.result-toolbar-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+/* 選択欄 */
+.result-toolbar-item select {
+    height: 42px;
+    padding: 0 10px;
+    font-size: 16px;
+}
+
+/* 絞り込み実行ボタン */
+.filter-submit-button {
+    width: 100%;
+    height: 44px;
+    margin-top: 20px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* 絞り込み専用フォームは、検索フォームの見た目を引き継がない */
+#filter-form {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    box-sizing: border-box;
+}
+
+/* 除外キーワードはサイドバー内に収める */
+#filter-form #exclude_keywords {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* 検索欄と表示設定を横並び */
+.search-top-row {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    flex-wrap: wrap;
+}
+
+/* 商品検索部分 */
+.main-search-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    /* 検索欄を広く使う */
+    flex: 1 1 600px;
+    margin: 20px 0;
+}
+
+/* 商品名入力欄を大きくする */
+.main-search-row input[type="search"] {
+    flex: 1;
+    min-width: 360px;
+    height: 46px;
+    padding: 0 14px;
+    font-size: 16px;
+}
+
+/* 表示設定 */
+.search-view-controls {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+/* ラベルとセレクトを横並び */
+.search-view-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.search-view-item select {
+    height: 42px;
+    padding: 0 10px;
+    font-size: 16px;
+}
+
+/* =========================
+   検索エリア全体
+   ========================= */
+
+/* 商品検索の1段目 */
+.search-main-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    width: 100%;
+    margin-bottom: 18px;
+}
+
+/* 商品検索欄を広くする */
+.search-main-row input[type="search"] {
+    flex: 1;
+
+    min-width: 400px;
+    max-width: 1100px;
+
+    height: 48px;
+
+    padding: 0 14px;
+
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+/* 検索ボタン */
+.search-main-row .main-search-button {
+    height: 48px;
+    padding: 0 26px;
+
+    font-size: 16px;
+}
+
+
+/* =========================
+   検索サイト
+   ========================= */
+
+.site-select-area {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    margin-bottom: 18px;
+}
+
+/* 選択中サイト */
+.selected-sites {
+    min-height: 30px;
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+
+/* =========================
+   表示設定
+   ========================= */
+
+.search-option-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+
+    width: 100%;
+    margin-top: 18px;
+}
+
+/* ラベル＋選択欄 */
+.search-option-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    white-space: nowrap;
+}
+
+.search-option-item select {
+    height: 42px;
+
+    padding: 0 10px;
+
+    font-size: 16px;
+}
+
+/* 履歴・お気に入り */
+.top-option-button {
+    height: 42px;
+
+    padding: 0 16px;
+
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* 選択中サイト部分を2段にする */
+.site-select-area {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+/* サイト名と検索サイト選択ボタンを横並び */
+.selected-sites-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+/* 見出し */
+.selected-sites-label {
+    font-weight: bold;
+}
+
+/* 選択中のサイト一覧を枠で囲む */
+.selected-sites {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+
+    min-height: 28px;
+    padding: 0;
+    border: none;
+    background: transparent;
+}
+
+/* 虫眼鏡の検索ボタン */
+.main-search-button {
+    width: 54px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+    cursor: pointer;
+}
+
+/* 虫眼鏡アイコン */
+.main-search-button svg {
+    width: 24px;
+    height: 24px;
+
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+}
+
+/* 虫眼鏡ボタン */
+.main-search-button {
+    width: 58px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+    cursor: pointer;
+}
+
+
+/* サイトロゴ＋サイト名 */
+.site-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    flex: 0 0 auto;
+}
+
+/* 仮サイトアイコン */
+.site-brand-icon {
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 2px solid #222;
+    border-radius: 8px;
+}
+
+/* アイコン内部の虫眼鏡 */
+.brand-search-icon {
+    position: relative;
+
+    width: 12px;
+    height: 12px;
+
+    border: 2px solid #222;
+    border-radius: 50%;
+}
+
+.brand-search-icon::after {
+    content: "";
+
+    position: absolute;
+
+    width: 6px;
+    height: 2px;
+
+    background: #222;
+
+    right: -5px;
+    bottom: -3px;
+
+    transform: rotate(45deg);
+}
+
+/* サイト名 */
+.site-brand-name {
+    font-size: 20px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+/* 検索ボタン内の虫眼鏡を少し大きくする */
+.search-button-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.search-button-icon::after {
+    width: 8px;
+    right: -6px;
+    bottom: -3px;
+}
+
+/* 検索ボタン */
+.main-search-button {
+    width: 58px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+    cursor: pointer;
+}
+
+/* SVGが切れないようにする */
+.main-search-button svg {
+    display: block;
+    flex-shrink: 0;
+    overflow: visible;
+}
+
+/* 選択中サイトの行 */
+.selected-sites-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* 選択中サイトの枠 */
+.selected-sites {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+
+    min-height: 42px;
+    padding: 0 14px;
+
+    border: 1px solid #ccc;
+    border-radius: 6px;
+
+    box-sizing: border-box;
+}
+
+/* 表示方法・並び順・表示件数など */
+.search-option-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+
+    width: 100%;
+    margin-top: 18px;
+}
+
+/* ラベルと選択欄 */
+.search-option-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    white-space: nowrap;
+}
+
+/* セレクトボックス */
+.search-option-item select {
+    height: 42px;
+    padding: 0 10px;
+
+    font-size: 16px;
+}
+
+/* 閲覧履歴・お気に入り */
+.top-option-button {
+    height: 42px;
+    padding: 0 16px;
+
+    font-size: 16px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+/* 選択中サイトと表示設定の縦間隔を狭くする */
+.site-select-area {
+    margin-bottom: 0;
+}
+
+/* 表示設定の行 */
+.search-option-row {
+    margin-top: 10px;
+
+    /* 項目同士は少し広めにする */
+    gap: 22px;
+}
+
+/* 「表示方法」など、文字と選択欄の間 */
+.search-option-item {
+    gap: 8px;
+}
+
+/* 閲覧履歴・お気に入りも少し余裕を持たせる */
+.top-option-button {
+    padding-left: 18px;
+    padding-right: 18px;
+}
+
+/* ヘッダー右側の閲覧履歴・お気に入り */
+.header-action-button {
+    min-width: 72px;
+    height: 58px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 2px;
+
+    padding: 4px 8px;
+
+    border: none;
+    background: transparent;
+
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* 上側のアイコン */
+.header-action-icon {
+    font-size: 25px;
+    line-height: 1;
+}
+
+/* 下側の文字 */
+.header-action-text {
+    font-size: 13px;
+    line-height: 1.2;
+}
+
+/* ホバーした時 */
+.header-action-button:hover {
+    background-color: #f5f5f5;
+    border-radius: 6px;
+}
+
+/* 検索サイトと表示設定を左右に配置 */
+.search-settings-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 32px;
+
+    width: 100%;
+    margin-top: 20px;
+}
+
+
+/* 項目タイトル */
+.selected-sites-label,
+.display-settings-label {
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+/* 表示設定側は余計な上余白をなくす */
+.search-option-row {
+    margin-top: 0;
+}
+
+/* 検索サイトと表示設定の間隔を詰める */
+.search-settings-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    gap: 24px;
+    width: 100%;
+}
+
+/* 左側は必要な幅だけ使う */
+.site-settings-block {
+    flex: 0 0 auto;
+}
+
+/* 右側も左から続けて配置 */
+.display-settings-block {
+    flex: 0 1 auto;
+}
+
+/* 表示設定の余計な余白をなくす */
+.search-option-row {
+    margin-top: 0;
+}
+
+/* 検索窓と虫眼鏡を一体化 */
+.keyword-search-box {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+}
+
+/* 検索窓 */
+.keyword-search-box input {
+    flex: 1;
+    min-width: 0;
+
+    border-right: none;
+
+    border-radius: 0;
+    box-sizing: border-box;
+}
+
+/* 虫眼鏡ボタン */
+.keyword-search-box .main-search-button {
+    width: 58px;
+    flex: 0 0 58px;
+
+    border-radius: 0;
+}
+
+/* 検索欄と下の設定欄の距離を詰める */
+.search-main-row {
+    margin-bottom: 8px;
+}
+
+/* 検索サイトと表示設定を横並び */
+.search-settings-row {
+    display: flex;
+
+    /* 縦位置を中央で揃える */
+    align-items: center;
+
+    justify-content: flex-start;
+    gap: 24px;
+
+    width: 100%;
+    margin-top: 0;
+}
+
+/* 選択中サイトの外枠 */
+.selected-sites-fieldset {
+    border: 1px solid #bdbdbd;
+    border-radius: 8px;
+
+    padding: 14px 16px 16px 16px;
+    margin: 0;
+
+    min-width: 0;
+}
+
+/* 枠の上に乗るタイトル */
+.selected-sites-fieldset legend {
+    padding: 0 8px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* 中の並び */
+.selected-sites-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+/* サイト名一覧 */
+.selected-sites {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+
+    min-height: 28px;
+    padding: 0;
+    border: none;
+    background: transparent;
+}
+
+/* 選択中サイトの枠とボタンを横並び */
+.selected-sites-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+/* 選択中サイトの外枠 */
+.selected-sites-fieldset {
+    margin: 0;
+    padding: 12px 16px 14px;
+
+    border: 1px solid #bdbdbd;
+    border-radius: 8px;
+
+    min-width: 520px;
+    box-sizing: border-box;
+}
+
+/* 枠タイトル */
+.selected-sites-fieldset legend {
+    padding: 0 8px;
+    font-weight: bold;
+}
+
+/* サイト名 */
+.selected-sites {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+
+    padding: 0;
+    border: none;
+    background: transparent;
+}
+
+/* 検索サイト側は必要な幅だけ使う */
+.site-settings-block {
+    flex: 0 0 auto;
+    width: auto;
+}
+
+/* 選択中サイトの枠とボタンを横並び */
+.selected-sites-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: nowrap;
+}
+
+/* 選択中サイトの枠 */
+.selected-sites-fieldset {
+    width: auto;
+    min-width: 520px;
+
+    margin: 0;
+    padding: 12px 16px 14px;
+
+    box-sizing: border-box;
+}
+
+/* サイト名部分 */
+.selected-sites {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+
+    width: auto;
+    min-width: 0;
+
+    padding: 0;
+    border: none;
+    background: transparent;
+}
+
+/* 検索サイト選択ボタンは縮ませない */
+.site-select-details {
+    flex: 0 0 auto;
+}
+
+
+
+
 
 
