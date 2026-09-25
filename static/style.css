@@ -398,7 +398,7 @@ overflow: hidden;
 /* 絞り込みと検索結果の2カラム */
 .content-layout {
     display: grid;
-    grid-template-columns: 260px 1fr;
+    grid-template-columns: 320px 1fr;
     gap: 30px;
     align-items: start;
     margin-top: 24px;
@@ -408,6 +408,9 @@ overflow: hidden;
 .filter-sidebar {
     padding: 20px;
     border-right: 1px solid #ddd;
+    /* スクロールしても左側を表示 */
+    position: sticky;
+    top: 20px;
 }
 
 /* 絞り込みタイトル */
@@ -1230,8 +1233,162 @@ main {
     flex: 0 0 auto;
 }
 
+/* 価格入力欄が小さくなりすぎないようにする */
+.price-input-wrap input {
+    min-width: 105px;
+    height: 48px;
+    padding: 0 10px;
+    box-sizing: border-box;
+}
+
+/* 絞り込み項目の縦間隔を統一 */
+#exclude_keywords {
+    margin-bottom: 16px;
+}
+
+.filter-price {
+    margin-bottom: 16px;
+}
+
+.filter-search-mode {
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+
+/* 検索窓＋検索ボタン全体の枠 */
+.keyword-search-box {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+
+    border: 1px solid #777;
+    box-sizing: border-box;
+}
+
+/* 商品検索入力欄 */
+.keyword-search-box input[type="search"] {
+    flex: 1;
+    min-width: 0;
+
+    border: none;
+    outline: none;
+
+    box-sizing: border-box;
+}
+
+/* 検索ボタン */
+.keyword-search-box .main-search-button {
+    width: 58px;
+    flex: 0 0 58px;
+
+    margin: 0;
+
+    /* 外側の枠は親に任せる */
+    border: none;
+
+    /* 入力欄との境目だけ表示 */
+    border-left: 1px solid #777;
+
+    box-sizing: border-box;
+}
 
 
+/* 上部広告エリア */
+.top-ad-area {
+    width: 100%;
+    min-height: 80px;
 
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
+    margin-bottom: 18px;
 
+    box-sizing: border-box;
+}
+
+/* 仮表示 */
+.top-ad-area span {
+    color: #999;
+    font-size: 14px;
+}
+
+/* 上部の楽天バナーを少し大きく表示 */
+.top-ad-area img {
+    display: block;
+    width: 520px;
+    max-width: 90vw;
+    height: auto;
+}
+
+/* サイドバー下の広告 */
+.sidebar-ad-area {
+    margin-top: 28px;
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* 広告画像がサイドバーからはみ出さないようにする */
+.sidebar-ad-area img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+/* 検索結果エリアの広告 */
+.result-ad-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 100%;
+
+    margin-top: 32px;
+    margin-bottom: 32px;
+
+    box-sizing: border-box;
+}
+
+/* 広告画像がはみ出さないようにする */
+.result-ad-area img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+.result-ad-area {
+    margin-top: 60px;
+}
+
+/* フッターのサービス表記を中央寄せ */
+footer {
+    width: 100%;
+    text-align: center;
+    margin-top: 30px;
+}
+/* 検索後のページ下広告 */
+.bottom-ad-area {
+    width: 100%;
+    margin: 36px auto 30px;
+
+    text-align: center;
+
+    box-sizing: border-box;
+}
+
+/* 広告本体を中央へ */
+.bottom-ad-area > * {
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.bottom-ad-area img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}

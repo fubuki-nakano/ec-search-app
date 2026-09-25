@@ -30,42 +30,73 @@ def search_serp(keyword, limit=5, sort="price_asc", min_price=None, max_price=No
             "price_desc": 2
         }[sort]
 
-    # 価格の上限下限を決める
-    if min_price is not None:
-        params["min_price"] = min_price
-    if max_price is not None:
-        params["max_price"] = max_price
+    # # 価格の上限下限を決める
+    # if min_price is not None:
+    #     params["min_price"] = min_price
+    # if max_price is not None:
+    #     params["max_price"] = max_price
+
     # APIと通信
     response = requests.get(url, params=params, timeout=15)
     # HTTPのエラー確認
     response.raise_for_status()
     # JSONをPython用のデータに
     data = response.json()
-# Google Shoppingの商品一覧を取得
+    # Google Shoppingの商品一覧を取得
     shopping_results = data.get("shopping_results", [])
+
+    # テスト用：Google Shoppingから何件返ってきたか確認
+    print("Google Shopping API取得件数:", len(shopping_results))
+
+    # テスト用：取得した商品の名前と価格を確認
+    for item in shopping_results[:10]:
+        print(
+            item.get("title"),
+            item.get("extracted_price")
+        )
 
     # 結果を入れる空リスト
     serp_results = []
     # 共通の表示形式に変換
     for item in shopping_results:
 
+        # Google Shoppingの商品価格を取得
+        price = item.get("extracted_price")
+
+        # 価格を取得できない商品は比較できないため除外
+        if price is None:
+            continue
+
+        # 整数に変換
+        price = int(price)
+
+        # 最低価格より安い商品は除外
+        if min_price is not None and price < min_price:
+            continue
+
+        # 最高価格より高い商品は除外
+        if max_price is not None and price > max_price:
+            continue
+
         # Google Shoppingの送料情報を取得
         delivery = item.get("delivery") or ""
 
         serp_results.append({
             "name": item.get("title", ""),
-            "price": int(item["extracted_price"]),
+            "price": price,
             "url": item.get("product_link", item.get("link", "")),
             "image": item.get("thumbnail", ""),
             "shop": item.get("source", ""),
             "rating": item.get("rating") or 0,
             "review_count": item.get("reviews") or 0,
+
             # Google Shoppingの送料情報をアプリ用に変換
             "postage": (
                 0 if "送料無料" in delivery
                 else 1 if delivery
                 else None
             ),
+
             # Google Shoppingではポイント情報を取得できない
             "point_rate": None,
         })

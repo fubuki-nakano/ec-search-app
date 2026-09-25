@@ -11,7 +11,15 @@
   </head>
   <body>
     <main>
-    <h1>商品比較検索</h1>
+
+    <!-- 上部広告 -->
+    <div class="top-ad-area">
+
+      <a href="https://hb.afl.rakuten.co.jp/hsc/57e0d11d.be6ab60b.57e0d11e.8401fa39/?link_type=pict&ut=eyJwYWdlIjoic2hvcCIsInR5cGUiOiJwaWN0IiwiY29sIjoxLCJjYXQiOiIxMTMiLCJiYW4iOjEyNTE4MjAsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style="word-wrap:break-word;"><img src="https://hbb.afl.rakuten.co.jp/hsb/57e0d11d.be6ab60b.57e0d11e.8401fa39/?me_id=1&me_adv_id=1251820&t=pict" border="0" style="margin:2px" alt="" title=""></a>
+
+      <a href="https://hb.afl.rakuten.co.jp/hsc/57e0f5ca.756c938a.57e0d11e.8401fa39/?link_type=pict&ut=eyJwYWdlIjoic2hvcCIsInR5cGUiOiJwaWN0IiwiY29sIjoxLCJjYXQiOiI1OCIsImJhbiI6MzIzMDk1MCwiYW1wIjpmYWxzZX0%3D" target="_blank" rel="nofollow sponsored noopener" style="word-wrap:break-word;"><img src="https://hbb.afl.rakuten.co.jp/hsb/57e0f5ca.756c938a.57e0d11e.8401fa39/?me_id=1&me_adv_id=3230950&t=pict" border="0" style="margin:2px" alt="" title=""></a>
+
+    </div>
 
     <!-- メイン検索フォーム -->
     <form id="search-form" method="get" action="/">
@@ -70,12 +78,13 @@
 
         </div>
 
-                <button
+          <button
           type="button"
           id="history-open-button"
           class="top-option-button"
         >
-          👓 閲覧履歴
+          <span class="top-option-icon">◷</span>
+          <span class="top-option-label">閲覧履歴</span>
         </button>
 
         <button
@@ -83,9 +92,10 @@
           id="favorite-open-button"
           class="top-option-button"
         >
-          ⭐ お気に入り
+          <span class="top-option-icon favorite-icon">☆</span>
+          <span class="top-option-label">お気に入り</span>
         </button>
-
+        
       </div>
 
 
@@ -355,12 +365,12 @@
                   <input
                     id="min_price"
                     name="min_price"
-                    type="number"
+                    type="text"
                     min="0"
                     value="{{ min_price_text }}"
-                    placeholder="最低価格"
+                    placeholder="￥500"
                   >
-                  <span class="price-unit">円</span>
+                  
                 </div>
 
                 <div class="price-max-group">
@@ -371,12 +381,12 @@
                     <input
                       id="max_price"
                       name="max_price"
-                      type="number"
+                      type="text"
                       min="0"
                       value="{{ max_price_text }}"
-                      placeholder="最高価格"
+                      placeholder="￥100000"
                     >
-                    <span class="price-unit">円</span>
+                    
                   </div>
 
                 </div>
@@ -417,6 +427,11 @@
             </button>
 
           </form>
+
+          <!-- サイドバー広告 -->
+          <div class="sidebar-ad-area">
+            <script type="text/javascript">rakuten_design="slide";rakuten_affiliateId="57e0e905.41d0cb78.57e0e906.1dde0fa1";rakuten_items="ctsmatch";rakuten_genreId="0";rakuten_size="250x250";rakuten_target="_blank";rakuten_theme="gray";rakuten_border="off";rakuten_auto_mode="on";rakuten_genre_title="off";rakuten_recommend="on";rakuten_ts="1790301591097";</script><script type="text/javascript" src="https://xml.affiliate.rakuten.co.jp/widget/js/rakuten_widget.js?20230106"></script>
+          
 
         </aside>
 
@@ -956,15 +971,63 @@
 
             </nav>
           {% endif %}
+
+
         <!-- エラー以外で検索結果が０の時 -->
         {% elif not errors %}<p>該当する商品がありません。商品名を変えて検索してください。</p>{% endif %}
-      {% else %}<p>サイトを選び、商品名を入力して検索してください。</p>{% endif %}
+      {% else %}
+      <p>サイトを選び、商品名を入力して検索してください。</p>
+      <!-- 検索前に表示する広告 -->
+      <div class="result-ad-area">
+
+        <!-- ↓ここに楽天からコピーした広告ソース -->
+        <script type="text/javascript">rakuten_design="slide";rakuten_affiliateId="57e0e905.41d0cb78.57e0e906.1dde0fa1";rakuten_items="ctsmatch";rakuten_genreId="0";rakuten_size="728x200";rakuten_target="_blank";rakuten_theme="gray";rakuten_border="off";rakuten_auto_mode="on";rakuten_genre_title="off";rakuten_recommend="on";rakuten_ts="1790303124354";</script><script type="text/javascript" src="https://xml.affiliate.rakuten.co.jp/widget/js/rakuten_widget.js?20230106"></script>
+
+      </div>
+      {% endif %}
+
         </section>
 
       </div>
+
+      <!-- 検索後だけ表示する広告 -->
+      {% if searched %}
+
+        <div class="bottom-ad-area">
+
+          <!-- 楽天広告 -->
+          <script type="text/javascript">
+            rakuten_design="slide";
+            rakuten_affiliateId="57e0e905.41d0cb78.57e0e906.1dde0fa1";
+            rakuten_items="ranking";
+            rakuten_genreId="0";
+            rakuten_size="728x90";
+            rakuten_target="_blank";
+            rakuten_theme="gray";
+            rakuten_border="off";
+            rakuten_auto_mode="on";
+            rakuten_genre_title="off";
+            rakuten_recommend="off";
+            rakuten_ts="1790303730312";
+          </script>
+
+          <script
+            type="text/javascript"
+            src="https://xml.affiliate.rakuten.co.jp/widget/js/rakuten_widget.js?20230106">
+          </script>
+
+        </div>
+
+      {% endif %}
+
       <footer>
         <a href="https://webservice.rakuten.co.jp/">Supported by 楽天ウェブサービス</a>
         / <a href="https://developer.yahoo.co.jp/sitemap/">Webサービス by Yahoo! JAPAN</a>
+        /<a href="https://serpapi.com/google-shopping-api"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Google Shopping via SerpApi</a>
       </footer>
       <!-- サイドバー表示中の背景 -->
       <div id="history-overlay" class="history-overlay"></div>
@@ -1412,6 +1475,95 @@
       // 価格の桁数に合わせて入力欄の幅を変更
       const priceInputs =
           document.querySelectorAll(".price-input-wrap input");
+
+      // 最低価格・最高価格を取得
+      const minPriceInput = document.getElementById("min_price");
+      const maxPriceInput = document.getElementById("max_price");
+
+
+      // 数字を「¥5,000」の形にする
+      function formatPrice(input) {
+
+          // ¥ とカンマを取り除く
+          const rawValue = input.value.replace(/[¥￥,]/g, "");
+
+          // 数字以外なら何もしない
+          if (rawValue === "" || isNaN(rawValue)) {
+              return;
+          }
+
+          // ¥ + 3桁ごとのカンマ
+          input.value = "¥" + Number(rawValue).toLocaleString("ja-JP");
+      }
+
+
+      // 入力欄をクリックしたら編集しやすい数字だけに戻す
+      function unformatPrice(input) {
+
+          input.value = input.value.replace(/[¥￥,]/g, "");
+      }
+
+
+      // 最低価格でEnterを押したら最高価格へ移動
+      minPriceInput.addEventListener("keydown", function(event) {
+
+          if (event.key === "Enter") {
+
+              event.preventDefault();
+
+              // 最低価格を表示用に整える
+              formatPrice(minPriceInput);
+
+              // 最高価格へ移動
+              maxPriceInput.focus();
+          }
+
+      });
+
+      // 最高価格でEnterを押したら入力を確定
+      maxPriceInput.addEventListener("keydown", function(event) {
+
+          if (event.key === "Enter") {
+
+              // Enterでフォームが送信されるのを防ぐ
+              event.preventDefault();
+
+              // ¥100,000 の形に整える
+              formatPrice(maxPriceInput);
+
+              // 入力欄からフォーカスを外して確定
+              maxPriceInput.blur();
+          }
+
+      });
+
+      // フォーカスしたら数字だけにする
+      minPriceInput.addEventListener("focus", function() {
+          unformatPrice(minPriceInput);
+      });
+
+      maxPriceInput.addEventListener("focus", function() {
+          unformatPrice(maxPriceInput);
+      });
+
+
+      // 入力欄から離れたら ¥5,000 の形にする
+      minPriceInput.addEventListener("blur", function() {
+          formatPrice(minPriceInput);
+      });
+
+      maxPriceInput.addEventListener("blur", function() {
+          formatPrice(maxPriceInput);
+      });
+
+
+      // 絞り込むボタンを押す直前に、送信用の数字だけに戻す
+      filterForm.addEventListener("submit", function() {
+
+          unformatPrice(minPriceInput);
+          unformatPrice(maxPriceInput);
+
+      });
 
       // 入力した桁数に合わせて数字部分だけ横幅を変更
       function updatePriceInputWidth(input) {
