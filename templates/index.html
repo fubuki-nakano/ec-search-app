@@ -491,66 +491,104 @@
             </p>
 
             <div class="table-wrap">
+
               <table>
+
                 <thead>
                   <tr>
                     <th scope="col">画像</th>
                     <th scope="col">商品名</th>
-                    <th scope="col">評価</th>
-                    <th scope="col">価格</th>
-                    <th scope="col">送料</th>
-                    <th scope="col">ポイント</th>
-                    <th scope="col">ショップ</th>
-                    <th scope="col">サイト</th>
+                    <th scope="col">価格・評価・ポイント</th>
+                    <th scope="col">ショップ・サイト</th>
                     <th scope="col">お気に入り</th>
                   </tr>
                 </thead>
 
+
                 <tbody>
+
                   {% for product in products %}
+
                     <tr>
 
+                      <!-- 商品画像 -->
                       <td>
+
                         {% if product.image.startswith(('https://', 'http://')) %}
-                          {% if product.url.startswith(('https://', 'http://')) %}
-                            <a
-                              class="product-link"
-                              href="{{ product.url }}"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              data-name="{{ product.name }}"
-                              data-price="{{ product.price }}"
-                              data-image="{{ product.image }}"
-                              data-site="{{ product.site }}"
-                            >
-                              <img
-                                src="{{ product.image }}"
-                                alt="{{ product.name }}"
-                                loading="lazy"
-                                width="100"
-                                height="100"
-                              >
-                              <br>
-                              商品ページへ
-                            </a>
-                          {% else %}
-                            <img
-                              src="{{ product.image }}"
-                              alt="{{ product.name }}"
-                              loading="lazy"
-                              width="100"
-                              height="100"
-                            >
-                          {% endif %}
+
+                          <img
+                            src="{{ product.image }}"
+                            alt="{{ product.name }}"
+                            loading="lazy"
+                            width="120"
+                            height="120"
+                          >
+
                         {% else %}
+
                           画像なし
+
                         {% endif %}
+
                       </td>
 
-                      <td>{{ product.name }}</td>
 
+                      <!-- 商品名 -->
                       <td>
-                        <div class="rating-row">
+
+                        {% if product.url.startswith(('https://', 'http://')) %}
+
+                          <a
+                            class="product-link compare-title-link"
+                            href="{{ product.url }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="{{ product.name }}"
+                            data-name="{{ product.name }}"
+                            data-price="{{ product.price }}"
+                            data-image="{{ product.image }}"
+                            data-site="{{ product.site }}"
+                          >
+                            {{ product.name }}
+                          </a>
+
+                        {% else %}
+
+                          {{ product.name }}
+
+                        {% endif %}
+
+                      </td>
+
+
+                      <!-- 価格・送料・評価・ポイント -->
+                      <td>
+
+                        <!-- 価格と送料 -->
+                        <div class="compare-price-row">
+
+                          <p class="price compare-price">
+                            ¥{{ "{:,}".format(product.price) }}
+                          </p>
+
+                          <p class="compare-postage">
+
+                            {% if product.postage == 0 %}
+                              送料込み
+                            {% elif product.postage == 1 %}
+                              送料別
+                            {% else %}
+                              送料：－
+                            {% endif %}
+
+                          </p>
+
+                        </div>
+
+
+                        <!-- 評価 -->
+                        <div class="rating-row compare-rating">
+
                           <span
                             class="star-rating"
                             style="--rating-percent: {{ product.rating / 5 * 100 }}%;"
@@ -559,38 +597,41 @@
                           </span>
 
                           {{ product.rating }}（{{ product.review_count }}件）
+
                         </div>
+
+
+                        <!-- ポイント -->
+                        <p>
+
+                          {% if product.point_rate %}
+                            ポイント：{{ "{:g}".format(product.point_rate) }}倍
+                          {% else %}
+                            ポイント：－
+                          {% endif %}
+
+                        </p>
+
                       </td>
 
-                      <td class="price">
-                        ¥{{ "{:,}".format(product.price) }}
-                      </td>
 
-                      <!-- 送料情報 -->
+                      <!-- ショップ・サイト -->
                       <td>
-                        {% if product.postage == 0 %}
-                          送料込み
-                        {% elif product.postage == 1 %}
-                          送料別
-                        {% else %}
-                          －
-                        {% endif %}
+
+                        <p>
+                          ショップ：{{ product.shop }}
+                        </p>
+
+                        <p>
+                          {{ product.site }}
+                        </p>
+
                       </td>
 
-                      <!-- ポイント倍率 -->
-                      <td>
-                        {% if product.point_rate %}
-                          {{ "{:g}".format(product.point_rate) }}倍
-                        {% else %}
-                          －
-                        {% endif %}
-                      </td>
 
-                      <td>{{ product.shop }}</td>
-
-                      <td>{{ product.site }}</td>
+                      <!-- お気に入り -->
                       <td>
-                        <!-- お気に入りに保存するための商品情報 -->
+
                         <button
                           type="button"
                           class="favorite-button"
@@ -602,12 +643,17 @@
                         >
                           ☆ お気に入り
                         </button>
+
                       </td>
 
                     </tr>
+
                   {% endfor %}
+
                 </tbody>
+
               </table>
+
             </div>
 
           <!-- サイト別比較 -->
@@ -631,21 +677,102 @@
 
                       <div class="compare-item">
 
-                        {% if product.image.startswith(('https://', 'http://')) %}
-                          <img
-                            src="{{ product.image }}"
-                            alt="{{ product.name }}"
-                            loading="lazy"
-                            width="100"
-                            height="100"
-                          >
-                        {% endif %}
+                        <!-- 上段：画像 / お気に入り / ショップ -->
+                        <div class="compare-top-row">
 
-                        <p class="compare-title" title="{{ product.name }}">
-                          {{ product.name }}
+                          <!-- 商品画像 -->
+                          <div class="compare-image">
+
+                            {% if product.image.startswith(('https://', 'http://')) %}
+                              <img
+                                src="{{ product.image }}"
+                                alt="{{ product.name }}"
+                                loading="lazy"
+                                width="120"
+                                height="120"
+                              >
+                            {% endif %}
+
+                          </div>
+
+
+                          <!-- 右上 -->
+                          <div class="compare-top-info">
+
+                            <!-- お気に入り -->
+                            <button
+                              type="button"
+                              class="favorite-button"
+                              data-name="{{ product.name }}"
+                              data-price="{{ product.price }}"
+                              data-image="{{ product.image }}"
+                              data-site="{{ product.site }}"
+                              data-url="{{ product.url }}"
+                            >
+                              ☆ お気に入り
+                            </button>
+
+                            <!-- ショップ名 -->
+                            <p class="compare-shop">
+                              ショップ：{{ product.shop }}
+                            </p>
+
+                          </div>
+
+                        </div>
+
+
+                        <!-- 商品名をクリックすると商品ページへ -->
+                        <p class="compare-title">
+
+                          {% if product.url.startswith(('https://', 'http://')) %}
+
+                            <a
+                              class="product-link compare-title-link"
+                              href="{{ product.url }}"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title="{{ product.name }}"
+                              data-name="{{ product.name }}"
+                              data-price="{{ product.price }}"
+                              data-image="{{ product.image }}"
+                              data-site="{{ product.site }}"
+                            >
+                              {{ product.name }}
+                            </a>
+
+                          {% else %}
+
+                            {{ product.name }}
+
+                          {% endif %}
+
                         </p>
 
-                        <p class="rating-row">
+
+                        <!-- 価格と送料 -->
+                        <div class="compare-price-row">
+
+                          <p class="price compare-price">
+                            ¥{{ "{:,}".format(product.price) }}
+                          </p>
+
+                          <p class="compare-postage">
+                            {% if product.postage == 0 %}
+                              送料込み
+                            {% elif product.postage == 1 %}
+                              送料別
+                            {% else %}
+                              送料：－
+                            {% endif %}
+                          </p>
+
+                        </div>
+
+
+                        <!-- 評価：価格の下 -->
+                        <div class="rating-row compare-rating">
+
                           <span
                             class="star-rating"
                             style="--rating-percent: {{ product.rating / 5 * 100 }}%;"
@@ -654,60 +781,22 @@
                           </span>
 
                           {{ product.rating }}（{{ product.review_count }}件）
-                        </p>
 
-                        <p class="price">
-                          ¥{{ "{:,}".format(product.price) }}
-                        </p>
-                        <p>{{ product.shop }}</p>
+                        </div>
 
-                        <!-- 送料情報 -->
-                        <p>
-                          {% if product.postage == 0 %}
-                            送料込み
-                          {% elif product.postage == 1 %}
-                            送料別
-                          {% else %}
-                            送料：－
-                          {% endif %}
-                        </p>
 
-                        <!-- ポイント倍率 -->
-                        <p>
-                          {% if product.point_rate %}
-                            ポイント：{{ "{:g}".format(product.point_rate) }}倍
-                          {% else %}
-                            ポイント：－
-                          {% endif %}
-                        </p>
+                        <!-- 下段：ポイント / 商品ページ -->
+                        <div class="compare-bottom-row">
 
-                        {% if product.url.startswith(('https://', 'http://')) %}
-                          <a
-                            class="product-link"
-                            href="{{ product.url }}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            data-name="{{ product.name }}"
-                            data-price="{{ product.price }}"
-                            data-image="{{ product.image }}"
-                            data-site="{{ product.site }}"
-                          >
-                            商品ページへ
-                          </a>
-                        {% endif %}
+                          <p class="compare-point">
+                            {% if product.point_rate %}
+                              ポイント：{{ "{:g}".format(product.point_rate) }}倍
+                            {% else %}
+                              ポイント：－
+                            {% endif %}
+                          </p>
 
-                        <!-- サイト別比較用のお気に入りボタン -->
-                        <button
-                          type="button"
-                          class="favorite-button"
-                          data-name="{{ product.name }}"
-                          data-price="{{ product.price }}"
-                          data-image="{{ product.image }}"
-                          data-site="{{ product.site }}"
-                          data-url="{{ product.url }}"
-                        >
-                          ☆ お気に入り
-                        </button>
+                        </div>
 
                       </div>
 
@@ -752,99 +841,146 @@
 
                     <!-- グループ内で一番安い商品に最安値を表示 -->
                     {% if loop.first %}
-                      <p class="lowest-price-label">最安値</p>
+                      <p class="lowest-price-label">✨最安値✨</p>
                     {% endif %}
 
-                    <div class="same-product-item">
+                    <div class="same-product-item{% if loop.first %} lowest-item{% endif %}">
 
-                      <!-- 商品画像 -->
-                  {% if product.image.startswith(('https://', 'http://')) %}
-                    <img
-                      src="{{ product.image }}"
-                      alt="{{ product.name }}"
-                      loading="lazy"
-                      width="100"
-                      height="100"
-                    >
-                  {% endif %}
+                      <!-- 上段：画像 / お気に入り / サイト・ショップ -->
+                      <div class="compare-top-row">
 
-                    <p>{{ product.site }}</p>
+                        <!-- 商品画像 -->
+                        <div class="compare-image">
 
-                    <!-- ショップ名 -->
-                    <p>{{ product.shop }}</p>
+                          {% if product.image.startswith(('https://', 'http://')) %}
+                            <img
+                              src="{{ product.image }}"
+                              alt="{{ product.name }}"
+                              loading="lazy"
+                              width="120"
+                              height="120"
+                            >
+                          {% endif %}
 
-                    <!-- 商品名は2行まで表示し、ホバー時に全文を確認 -->
-                    <p
-                      class="same-product-title"
-                      title="{{ product.name }}"
-                    >
-                      {{ product.name }}
-                    </p>
+                        </div>
 
-                    <!-- 評価とレビュー件数 -->
-                    <p class="rating-row">
-                      <span
-                        class="star-rating"
-                        style="--rating-percent: {{ product.rating / 5 * 100 }}%;"
-                      >
-                        ★★★★★
-                      </span>
 
-                      {{ product.rating }}（{{ product.review_count }}件）
-                    </p>
+                        <!-- 右上 -->
+                        <div class="compare-top-info">
 
-                    <p class="price">
-                      ¥{{ "{:,}".format(product.price) }}
-                    </p>
+                          <!-- お気に入り -->
+                          <button
+                            type="button"
+                            class="favorite-button"
+                            data-name="{{ product.name }}"
+                            data-price="{{ product.price }}"
+                            data-image="{{ product.image }}"
+                            data-site="{{ product.site }}"
+                            data-url="{{ product.url }}"
+                          >
+                            ☆ お気に入り
+                          </button>
 
-                    <!-- 送料情報 -->
-                    <p>
-                      {% if product.postage == 0 %}
-                        送料込み
-                      {% elif product.postage == 1 %}
-                        送料別
-                      {% else %}
-                        送料：－
-                      {% endif %}
-                    </p>
+                          <!-- サイト名 -->
+                          <p class="same-product-site">
+                            {{ product.site }}
+                          </p>
 
-                    <!-- ポイント倍率 -->
-                    <p>
-                      {% if product.point_rate %}
-                        ポイント：{{ "{:g}".format(product.point_rate) }}倍
-                      {% else %}
-                        ポイント：－
-                      {% endif %}
-                    </p>
+                          <!-- ショップ名 -->
+                          <p class="compare-shop">
+                            ショップ：{{ product.shop }}
+                          </p>
 
-                    {% if product.url.startswith(('https://', 'http://')) %}
-                      <a
-                        href="{{ product.url }}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        商品ページへ
-                      </a>
-                    {% endif %}
+                        </div>
 
-                    <!-- 同一商品比較用のお気に入りボタン -->
-                    <button
-                      type="button"
-                      class="favorite-button"
-                      data-name="{{ product.name }}"
-                      data-price="{{ product.price }}"
-                      data-image="{{ product.image }}"
-                      data-site="{{ product.site }}"
-                      data-url="{{ product.url }}"
-                    >
-                      ☆ お気に入り
-                    </button>
+                      </div>
 
-                    </div>
 
-                  </div>
 
-                {% endfor %}
+                      <!-- 商品名をクリックすると商品ページへ -->
+                      <p class="compare-title">
+
+                        {% if product.url.startswith(('https://', 'http://')) %}
+
+                          <a
+                            class="product-link compare-title-link"
+                            href="{{ product.url }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="{{ product.name }}"
+                            data-name="{{ product.name }}"
+                            data-price="{{ product.price }}"
+                            data-image="{{ product.image }}"
+                            data-site="{{ product.site }}"
+                          >
+                            {{ product.name }}
+                          </a>
+
+                        {% else %}
+
+                          {{ product.name }}
+
+                        {% endif %}
+
+                      </p>
+
+
+                      <!-- 価格と送料 -->
+                      <div class="compare-price-row">
+
+                        <p class="price compare-price">
+                          ¥{{ "{:,}".format(product.price) }}
+                        </p>
+
+                        <p class="compare-postage">
+                          {% if product.postage == 0 %}
+                            送料込み
+                          {% elif product.postage == 1 %}
+                            送料別
+                          {% else %}
+                            送料：－
+                          {% endif %}
+                        </p>
+
+                      </div>
+
+
+                      <!-- 評価 -->
+                      <div class="rating-row compare-rating">
+
+                        <span
+                          class="star-rating"
+                          style="--rating-percent: {{ product.rating / 5 * 100 }}%;"
+                        >
+                          ★★★★★
+                        </span>
+
+                        {{ product.rating }}（{{ product.review_count }}件）
+
+                      </div>
+
+
+                      <!-- ポイント -->
+                      <div class="compare-bottom-row">
+
+                        <p class="compare-point">
+                          {% if product.point_rate %}
+                            ポイント：{{ "{:g}".format(product.point_rate) }}倍
+                          {% else %}
+                            ポイント：－
+                          {% endif %}
+                        </p>
+
+                      </div>
+                      <!-- ↑ compare-bottom-row を閉じる -->
+
+                      </div>
+                      <!-- ↑ same-product-item を閉じる -->
+
+                      </div>
+                      <!-- ↑ same-product-wrapper を閉じる -->
+
+                      {% endfor %}
 
               </section>
 
@@ -1169,22 +1305,40 @@
 
       // 保存済みのお気に入りを確認してボタン表示を変更
       function updateFavoriteButtons() {
-        const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
 
-        favoriteButtons.forEach(function(button) {
+          const favorites =
+              JSON.parse(localStorage.getItem("favorites")) || [];
 
-          // この商品がお気に入りに入っているか確認
-          const isFavorite = favorites.some(function(item) {
-            return item.url === button.dataset.url;
+          favoriteButtons.forEach(function(button) {
+
+              // この商品がお気に入りに入っているか確認
+              const isFavorite = favorites.some(function(item) {
+                  return item.url === button.dataset.url;
+              });
+
+              // 登録済みなら⭐、未登録なら☆
+              if (isFavorite) {
+
+                  button.textContent = "⭐";
+                  button.setAttribute(
+                      "aria-label",
+                      "お気に入りから削除"
+                  );
+                  button.title = "お気に入りから削除";
+
+              } else {
+
+                  button.textContent = "☆お気に入り";
+                  button.setAttribute(
+                      "aria-label",
+                      "お気に入りに追加"
+                  );
+                  button.title = "お気に入りに追加";
+
+              }
+
           });
 
-          // 登録済みなら黄色い星にする
-          if (isFavorite) {
-            button.textContent = "⭐ お気に入り";
-          } else {
-            button.textContent = "☆ お気に入り";
-          }
-        });
       }
 
       // ページを開いた時にお気に入り状態を反映
@@ -1381,22 +1535,32 @@
           });
 
           if (isFavorite) {
+
             // 登録済みならお気に入りから削除
             favorites = favorites.filter(function(item) {
-              return item.url !== product.url;
+                return item.url !== product.url;
             });
 
             button.textContent = "☆ お気に入り";
+            button.setAttribute("aria-label", "お気に入りに追加");
 
-          } else {
+            // 未登録になったので説明を消す
+            button.removeAttribute("title");
+
+        } else {
+
             // 未登録ならお気に入りに追加
             favorites.unshift(product);
 
-            // お気に入りは最大100件まで保存
+            // お気に入りは最大100件
             favorites = favorites.slice(0, 100);
 
-            button.textContent = "⭐ お気に入り";
-          }
+            button.textContent = "⭐";
+            button.setAttribute("aria-label", "お気に入りから削除");
+
+            // ⭐にカーソルを置いた時だけ表示
+            button.title = "お気に入りから削除";
+        }
 
           // お気に入りを保存
         localStorage.setItem("favorites", JSON.stringify(favorites));

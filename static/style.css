@@ -147,7 +147,7 @@ left: 0;
 top: 0;
 width: var(--rating-percent);
 overflow: hidden;
-color: #000;
+color: #f4b400;
 white-space: nowrap;
 }
 
@@ -213,12 +213,26 @@ white-space: nowrap;
     gap: 12px;
 }
 
-/* 同一商品比較のグループ */
+/* 同一商品を横並びにする */
 .same-product-group {
-display: grid;
-grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-gap: 16px;
-margin-bottom: 32px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: stretch;
+    margin-bottom: 32px;
+}
+
+/* 型番などの見出しは1行全部使う */
+.same-product-group h3 {
+    flex: 0 0 100%;
+}
+
+/* 商品カード1枚分 */
+.same-product-wrapper {
+    flex: 0 0 400px;
+    max-width: 400px;
+    position: relative;
+    padding-top: 12px;
 }
 
 /* 型番の見出しは1行全部を使う */
@@ -252,26 +266,34 @@ font-weight: bold;
 margin: 0 0 8px 0;
 }
 
-/* 最安値ラベル＋商品カードをまとめる箱 */
+/* 最安値ラベル＋商品カード */
 .same-product-wrapper {
-position: relative;
+    position: relative;
 
-/* 最安値ラベルを置くスペースを全カードで確保 */
-padding-top: 42px;
+    /* ラベルを枠に重ねるための少しだけの余白 */
+    padding-top: 12px;
 }
 
 /* 最安値ラベル */
 .lowest-price-label {
-position: absolute;
-top: 0;
-left: 0;
+    position: absolute;
 
-width: fit-content;
-padding: 4px 8px;
-border: 1px solid #999;
-border-radius: 999px;
-font-weight: bold;
-margin: 0;
+    /* 商品カードの上枠に重ねる */
+    top: 0;
+    left: 16px;
+
+    width: fit-content;
+    margin: 0;
+    padding: 0 8px;
+
+    /* 後ろの枠線を隠す */
+    background: #fafafa;
+
+    border: none;
+    border-radius: 0;
+
+    font-weight: bold;
+    z-index: 2;
 }
 
 /* 同一商品比較の商品名を2行まで表示 */
@@ -1391,4 +1413,231 @@ footer {
     display: block;
     max-width: 100%;
     height: auto;
+}
+
+/* 閲覧履歴・お気に入り */
+.top-option-button {
+    width: 100px;
+    height: 60px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 2px;
+
+    padding: 4px 8px;
+
+    border: none;
+    background: transparent;
+
+    cursor: pointer;
+}
+
+/* 上側のアイコン */
+.top-option-icon {
+    font-size: 26px;
+    line-height: 1;
+}
+
+/* お気に入りの星 */
+.favorite-icon {
+    color: #e0a800;
+}
+
+/* 下側の文字 */
+.top-option-label {
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+/* マウスを乗せた時だけ薄く背景を付ける */
+.top-option-button:hover {
+    background: #f5f5f5;
+    border-radius: 6px;
+}
+
+/* 商品カード上段 */
+.compare-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+/* 商品画像 */
+.compare-image img {
+    display: block;
+    object-fit: contain;
+}
+
+/* お気に入りとショップ */
+.compare-top-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+/* ショップ名 */
+.compare-shop {
+    margin: 0;
+    font-size: 14px;
+    text-align: right;
+}
+
+/* 商品名 */
+.compare-title {
+    margin: 16px 0;
+}
+
+/* 価格と送料 */
+.compare-price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+}
+
+/* 価格を少し大きく */
+.compare-price {
+    margin: 0;
+    font-size: 26px;
+    font-weight: bold;
+}
+
+/* 送料は価格より小さく */
+.compare-postage {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* 評価は価格の下 */
+.compare-rating {
+    margin-top: 8px;
+}
+
+/* 最下段 */
+.compare-bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+/* ポイント */
+.compare-point {
+    margin: 0;
+}
+/* 商品名リンク */
+.compare-title-link {
+    color: #0000ee;
+    text-decoration: underline;
+}
+
+/* 一度開いた商品も青のまま */
+.compare-title-link:visited {
+    color: #7b00ee;
+}
+
+/* カーソルを合わせた時 */
+.compare-title-link:hover {
+    color: #0000bb;
+}
+
+
+
+/* 最安値ラベル */
+.lowest-price-label {
+    color: #b88600;
+    background: #fafafa;
+}
+
+/* 同一商品比較のサイト名 */
+.same-product-site {
+    margin: 0;
+    font-size: 14px;
+    text-align: right;
+}
+/* 通常の商品カード */
+.same-product-item {
+    position: relative;
+    border: 1px solid #ccc;
+    padding: 16px;
+    border-radius: 8px;
+}
+/* 最安値の商品だけ金色 */
+.same-product-item.lowest-item {
+    border: 2px solid #e0a800;
+}
+
+/* 同一商品を横並びにする */
+.same-product-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: stretch;
+}
+
+/* 型番などの見出しは1行全部使う */
+.same-product-group > h3 {
+    flex: 0 0 100%;
+}
+
+/* 同一商品比較：1列に3枚並べる */
+.same-product-wrapper {
+    flex: 0 0 calc((100% - 32px) / 3);
+    max-width: calc((100% - 32px) / 3);
+    min-width: 0;
+
+    position: relative;
+    padding-top: 12px;
+    box-sizing: border-box;
+}
+
+/* 同一商品グループの見出し */
+.same-product-group > h3 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 0 0 100%;
+}
+
+/* 商品件数の右側に区切り線 */
+.same-product-group > h3::after {
+    content: "";
+    flex: 1;
+    height: 2px;
+    background: #ddd;
+}
+
+/* 通常一覧：画像列 */
+.table-wrap th:nth-child(1),
+.table-wrap td:nth-child(1) {
+    width: 140px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* 通常一覧：商品名列 */
+.table-wrap th:nth-child(2),
+.table-wrap td:nth-child(2) {
+    width: 42%;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* 通常一覧：見出しをコンパクトにする */
+.table-wrap th {
+    padding: 8px 10px;
+    font-size: 15px;
+    line-height: 1.2;
+    vertical-align: middle;
+}
+
+/* ショップ・サイト / お気に入り は1行にする */
+.table-wrap th:nth-child(4),
+.table-wrap th:nth-child(5) {
+    white-space: nowrap;
 }
