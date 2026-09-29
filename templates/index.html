@@ -20,9 +20,8 @@
     <!-- 上部広告 -->
     <div class="top-ad-area">
 
-      <a href="https://hb.afl.rakuten.co.jp/hsc/57e0d11d.be6ab60b.57e0d11e.8401fa39/?link_type=pict&ut=eyJwYWdlIjoic2hvcCIsInR5cGUiOiJwaWN0IiwiY29sIjoxLCJjYXQiOiIxMTMiLCJiYW4iOjEyNTE4MjAsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style="word-wrap:break-word;"><img src="https://hbb.afl.rakuten.co.jp/hsb/57e0d11d.be6ab60b.57e0d11e.8401fa39/?me_id=1&me_adv_id=1251820&t=pict" border="0" style="margin:2px" alt="" title=""></a>
-
       <a href="https://hb.afl.rakuten.co.jp/hsc/57e0f5ca.756c938a.57e0d11e.8401fa39/?link_type=pict&ut=eyJwYWdlIjoic2hvcCIsInR5cGUiOiJwaWN0IiwiY29sIjoxLCJjYXQiOiI1OCIsImJhbiI6MzIzMDk1MCwiYW1wIjpmYWxzZX0%3D" target="_blank" rel="nofollow sponsored noopener" style="word-wrap:break-word;"><img src="https://hbb.afl.rakuten.co.jp/hsb/57e0f5ca.756c938a.57e0d11e.8401fa39/?me_id=1&me_adv_id=3230950&t=pict" border="0" style="margin:2px" alt="" title=""></a>
+
 
     </div>
 
@@ -235,7 +234,10 @@
               <select
                 id="sort"
                 name="sort"
-                {% if search_id %}
+
+                {% if display_mode == "same_product" %}
+                  disabled
+                {% elif search_id %}
                   onchange="
                     const sortParams =
                       new URLSearchParams(window.location.search);
@@ -258,10 +260,43 @@
                 {% endif %}
               >
 
-                {% for value, label in sorts.items() %}
+                {% if display_mode == "same_product" %}
+
+                  <!-- 同一商品比較ではおすすめ順固定 -->
+                  <option value="recommend_desc" selected>
+                    おすすめ順
+                  </option>
+
+                {% else %}
+
+                  {% for value, label in sorts.items() %}
+                    <option
+                      value="{{ value }}"
+                      {% if value == sort %}selected{% endif %}
+                    >
+                      {{ label }}
+                    </option>
+                  {% endfor %}
+
+                {% endif %}
+
+              </select>
+
+            </div>
+
+            <!-- 検索精度 -->
+            <div class="search-option-item">
+
+              <label for="search_mode">検索精度</label>
+
+              <select
+                id="search_mode"
+                name="search_mode"
+              >
+                {% for value, label in search_modes.items() %}
                   <option
                     value="{{ value }}"
-                    {% if value == sort %}selected{% endif %}
+                    {% if value == search_mode %}selected{% endif %}
                   >
                     {{ label }}
                   </option>
@@ -282,13 +317,51 @@
 
     </form>
 
+    <!-- 狭い画面用：絞り込みタブ -->
+    <button
+      type="button"
+      id="mobile-filter-toggle"
+      class="mobile-filter-toggle"
+      aria-expanded="false"
+    >
+      絞り込み ▼
+    </button>
+
+
+
       <!-- 絞り込みと検索結果を左右に分ける -->
       <div class="content-layout">
 
         <!-- 左側：絞り込み -->
         <aside class="filter-sidebar">
 
-          <h2>絞り込み</h2>
+          <div class="filter-header">
+            <h2>絞り込み</h2>
+
+            <form method="get" class="filter-reset-form">
+              <input type="hidden" name="keyword" value="{{ request.args.get('keyword', '') }}">
+
+              {% for site in request.args.getlist('sites') %}
+                <input type="hidden" name="sites" value="{{ site }}">
+              {% endfor %}
+
+              <input type="hidden" name="limit" value="{{ request.args.get('limit', '10') }}">
+              <input type="hidden" name="sort" value="{{ request.args.get('sort', 'recommend_desc') }}">
+              <input type="hidden" name="display_mode" value="{{ request.args.get('display_mode', 'list') }}">
+
+              {% if request.args.get('search_id') %}
+                <input type="hidden" name="search_id" value="{{ request.args.get('search_id') }}">
+              {% endif %}
+
+              {% if request.args.get('display_site') %}
+                <input type="hidden" name="display_site" value="{{ request.args.get('display_site') }}">
+              {% endif %}
+
+              <input type="hidden" name="page" value="1">
+
+              <button type="submit" class="filter-reset-btn">リセット</button>
+            </form>
+          </div>
 
           <!-- 絞り込み専用フォーム -->
           <form id="filter-form" method="get" action="/">
@@ -328,6 +401,13 @@
               type="hidden"
               name="limit"
               value="{{ limit }}"
+            >
+
+            <!-- 現在の検索精度を引き継ぐ -->
+            <input
+              type="hidden"
+              name="search_mode"
+              value="{{ search_mode }}"
             >
 
 
@@ -385,27 +465,31 @@
 
             </div>
 
+            <!-- 送料・ポイントで絞り込み -->
+            <div class="filter-extra-options">
 
-            <!-- 検索精度 -->
-            <div class="filter-search-mode">
+              <label class="filter-checkbox">
+                <input
+                  type="checkbox"
+                  name="postage_only"
+                  value="1"
+                  {% if request.args.get("postage_only") == "1" %}checked{% endif %}
+                >
+                送料込みのみ
+              </label>
 
-              <label for="search_mode">検索精度</label>
-
-              <select
-                id="search_mode"
-                name="search_mode"
-              >
-                {% for value, label in search_modes.items() %}
-                  <option
-                    value="{{ value }}"
-                    {% if value == search_mode %}selected{% endif %}
-                  >
-                    {{ label }}
-                  </option>
-                {% endfor %}
-              </select>
+              <label class="filter-checkbox">
+                <input
+                  type="checkbox"
+                  name="point_up_only"
+                  value="1"
+                  {% if request.args.get("point_up_only") == "1" %}checked{% endif %}
+                >
+                ポイントアップのみ
+              </label>
 
             </div>
+
 
 
             <!-- 絞り込みを実行 -->
@@ -420,7 +504,7 @@
 
           <!-- サイドバー広告 -->
           <div class="sidebar-ad-area">
-            <a href="https://hb.afl.rakuten.co.jp/hsc/57fa333e.c818cab4.57e0d11e.8401fa39/?link_type=pict&ut=eyJwYWdlIjoic2hvcCIsInR5cGUiOiJwaWN0IiwiY29sIjoxLCJjYXQiOiIxMDIiLCJiYW4iOjMyNzQwMDQsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style="word-wrap:break-word;"><img src="https://hbb.afl.rakuten.co.jp/hsb/57fa333e.c818cab4.57e0d11e.8401fa39/?me_id=1&me_adv_id=3274004&t=pict" border="0" style="margin:2px" alt="" title=""></a>
+            <a href="https://hb.afl.rakuten.co.jp/hsc/5803ee58.1eb18cf3.57e0d11e.8401fa39/?link_type=pict&ut=eyJwYWdlIjoic2hvcCIsInR5cGUiOiJwaWN0IiwiY29sIjoxLCJjYXQiOiIxNyIsImJhbiI6Mjc2NzYzNywiYW1wIjpmYWxzZX0%3D" target="_blank" rel="nofollow sponsored noopener" style="word-wrap:break-word;"><img src="https://hbb.afl.rakuten.co.jp/hsb/5803ee58.1eb18cf3.57e0d11e.8401fa39/?me_id=1&me_adv_id=2767637&t=pict" border="0" style="margin:2px" alt="" title=""></a>
           
 
         </aside>
@@ -693,6 +777,7 @@
             <p>
               サイトごとに商品を表示しています。
             </p>
+
 
             <div class="compare-grid">
 
@@ -1655,6 +1740,36 @@
       // 絞り込みフォーム
       const filterForm = document.getElementById("filter-form");
 
+      // スマホ用の絞り込みタブ
+      const mobileFilterToggle =
+          document.getElementById("mobile-filter-toggle");
+
+      const filterSidebar =
+          document.querySelector(".filter-sidebar");
+
+      const pagination =
+          document.querySelector(".pagination");
+
+      if (mobileFilterToggle && filterSidebar) {
+          mobileFilterToggle.addEventListener("click", function() {
+
+              const isOpen =
+                  filterSidebar.classList.toggle("mobile-open");
+
+              mobileFilterToggle.textContent =
+                  isOpen ? "絞り込み ▲" : "絞り込み ▼";
+
+              mobileFilterToggle.setAttribute(
+                  "aria-expanded",
+                  isOpen
+              );
+
+              // 開いた瞬間にも現在の横スクロール位置を反映
+              keepMobileHeaderVisible();
+
+          });
+      }
+
       // 絞り込み欄ではEnterキーで送信しない
       filterForm.addEventListener("keydown", function(event) {
 
@@ -1790,6 +1905,119 @@
         favoriteSidebar.classList.remove("open");
         historyOverlay.classList.remove("open");
       });
+
+      // 900px以下では検索エリアを横スクロールに追従させる
+      const searchForm = document.getElementById("search-form");
+      const mobileFilterButton =
+        document.getElementById("mobile-filter-toggle");
+      const resultHeadingRow =
+        document.querySelector(".result-heading-row");
+      // 上部広告
+      const topAdArea =
+          document.querySelector(".top-ad-area");
+
+      // 一番下のサービス表記
+      const pageFooter =
+          document.querySelector("footer");
+      // 900px以下では必要な部分だけ横スクロールに追従させる
+      function keepMobileHeaderVisible() {
+
+          if (window.innerWidth <= 900) {
+
+              const scrollX = window.scrollX;
+
+              // 検索エリア
+              if (searchForm) {
+                  searchForm.style.transform =
+                      `translateX(${scrollX}px)`;
+              }
+
+              // 絞り込みタブ
+              if (mobileFilterButton) {
+                  mobileFilterButton.style.transform =
+                      `translateX(${scrollX}px)`;
+              }
+
+              // 開いている絞り込み欄
+              if (
+                  filterSidebar &&
+                  filterSidebar.classList.contains("mobile-open")
+              ) {
+                  filterSidebar.style.transform =
+                      `translateX(${scrollX}px)`;
+              }
+
+              // 検索結果件数・表示件数
+              if (resultHeadingRow) {
+                  resultHeadingRow.style.transform =
+                      `translateX(${scrollX}px)`;
+              }
+
+              // ページング
+              if (pagination) {
+                  pagination.style.transform =
+                      `translateX(${scrollX}px)`;
+              }
+
+              // 上部広告
+              if (topAdArea) {
+                  topAdArea.style.transform =
+                      `translateX(${scrollX}px)`;
+              }
+
+              // 一番下のサービス表記
+              if (pageFooter) {
+                  pageFooter.style.transform =
+                      `translateX(${scrollX}px)`;
+              }
+
+          } else {
+
+              // PC表示に戻ったら追従を解除
+              if (searchForm) {
+                  searchForm.style.transform = "";
+              }
+
+              if (mobileFilterButton) {
+                  mobileFilterButton.style.transform = "";
+              }
+
+              if (filterSidebar) {
+                  filterSidebar.style.transform = "";
+              }
+
+              if (resultHeadingRow) {
+                  resultHeadingRow.style.transform = "";
+              }
+
+              if (pagination) {
+                  pagination.style.transform = "";
+              }
+
+              if (topAdArea) {
+                  topAdArea.style.transform = "";
+              }
+
+              if (pageFooter) {
+                  pageFooter.style.transform = "";
+              }
+          }
+      }
+
+      // 横スクロールした時
+      window.addEventListener(
+          "scroll",
+          keepMobileHeaderVisible
+      );
+
+      // 画面幅を変えた時
+      window.addEventListener(
+          "resize",
+          keepMobileHeaderVisible
+      );
+
+      // 最初の表示時
+      keepMobileHeaderVisible();
     </script>
   </body>
 </html>

@@ -89,7 +89,6 @@ appearance: textfield;
 .compare-grid {
 display: flex;
 gap: 16px;
-overflow-x: auto;
 align-items: flex-start;
 padding-bottom: 8px;
 }
@@ -1384,7 +1383,7 @@ border-color: #666;
     justify-content: center;
     align-items: flex-start;
 
-    width: 95%;
+    width: 100%;
     box-sizing: border-box;
 }
 
@@ -1796,3 +1795,364 @@ footer {
 
     white-space: nowrap;
 }
+
+
+/* 絞り込み見出し + リセットボタン */
+.filter-header {
+display: flex;
+align-items: center;
+justify-content: flex-start;
+gap: 8px;
+margin-bottom: 16px;
+}
+
+.filter-header h2 {
+margin: 0;
+}
+
+.filter-reset-form {
+display: block;
+margin: 0;
+padding: 0;
+border: none;
+background: transparent;
+}
+
+.filter-reset-btn {
+padding: 4px 9px;
+font-size: 12px;
+
+background-color: #f5f5f5;
+color: #222;
+font-weight: 600;
+
+border: 1px solid #cfcfcf80;
+border-radius: 7px;
+
+cursor: pointer;
+white-space: nowrap;
+
+position: relative;
+top: 2px;
+}
+
+.filter-reset-btn:hover {
+background-color: #ebebeb;
+}
+
+/* 表示方法・並び順・検索精度を1列にする */
+.search-option-row {
+    flex-wrap: nowrap;
+}
+
+/* 検索精度は短いので少しコンパクトにする */
+#search_mode {
+    min-width: 85px;
+    width: 85px;
+}
+
+/* 表示方法を少しコンパクトにする */
+#display_mode {
+    min-width: 150px;
+    width: 150px;
+}
+
+/* 送料・ポイントの絞り込み */
+.filter-extra-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 18px;
+}
+
+/* 絞り込み用チェックボックス */
+.filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+/* スマホ用の絞り込みタブ
+   PCでは表示しない */
+.mobile-filter-toggle {
+    display: none;
+}
+
+.filter-checkbox input {
+    margin: 0;
+}
+
+/* =========================
+   タブレット・少し狭いPC
+   ========================= */
+@media (max-width: 1450px) {
+
+    /* 検索サイトと表示設定を必要に応じて折り返す */
+    .search-settings-row {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        gap: 16px;
+    }
+
+    /* 検索サイト側は1行分使う */
+    .site-settings-block {
+        width: 100%;
+        flex: 1 1 100%;
+    }
+
+    /* 選択中サイトとボタン */
+    .selected-sites-row {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    /* 520px固定を解除して縮められるようにする */
+    .selected-sites-fieldset {
+        flex: 1 1 520px;
+        min-width: 0;
+    }
+
+    /* 表示方法・並び順・検索精度も1行分使う */
+    .display-settings-block {
+        width: 100%;
+        flex: 1 1 100%;
+    }
+
+    /* 幅が足りなければ自然に折り返す */
+    .search-option-row {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+}
+
+/* =========================
+   画面幅が狭い時の調整
+   ========================= */
+@media (max-width: 900px) {
+
+    /* ページ左右の余白を縮める */
+    main {
+        padding: 16px;
+    }
+
+    /* 上段を折り返せるようにする */
+    .search-main-row {
+        flex-wrap: wrap;
+    }
+
+    /* ロゴ */
+    .site-brand-logo {
+        width: 180px;
+    }
+
+    /* 検索窓は次の行でも横幅いっぱい使える */
+    .keyword-search-box {
+        flex: 1 1 100%;
+        width: 100%;
+    }
+
+    /* 検索サイト・表示設定を縦方向へ */
+    .search-settings-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+    }
+
+    /* 選択中サイトの520px固定を解除 */
+    .selected-sites-fieldset {
+    width: 100%;
+    min-width: 0;
+
+    /* fieldset共通の100%指定を解除 */
+    flex: 0 0 auto;
+    height: auto;
+}
+
+    /* サイト枠とボタンを折り返す */
+    .selected-sites-row {
+        flex-wrap: wrap;
+    }
+
+    /* 表示方法・並び順・検索精度も折り返す */
+    .search-option-row {
+        flex-wrap: wrap;
+    }
+
+    /* 左の絞り込みと右の結果を1列にする */
+    .content-layout {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    /* スマホでは絞り込みを固定しない */
+    .filter-sidebar {
+        position: static;
+        top: auto;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+    }
+
+    /* 上部広告は狭い画面では縦に並べる */
+    .top-ad-area {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    /* 広告1枚で1行使う */
+    .top-ad-area > a {
+        flex: 0 0 100%;
+        max-width: 100%;
+
+        display: flex;
+        justify-content: center;
+    }
+
+    /* 広告を画面幅からはみ出させない */
+    .top-ad-area img {
+        width: auto;
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* 狭い画面では絞り込みタブを表示 */
+    .mobile-filter-toggle {
+        display: block;
+
+        width: 100%;
+        margin: 12px 0 16px;
+        padding: 12px 16px;
+
+        text-align: left;
+        font-size: 16px;
+        font-weight: 700;
+
+        background: #fff;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+
+        cursor: pointer;
+    }
+
+    /* 最初は絞り込み本体を閉じておく */
+    .filter-sidebar {
+        display: none;
+    }
+
+    /* タブを押した時だけ表示 */
+    .filter-sidebar.mobile-open {
+        display: block;
+    }
+
+    /* =========================
+   900px以下：検索エリアの配置
+   ========================= */
+
+    /* 上段をグリッド配置にする */
+    .search-main-row {
+        display: grid;
+        grid-template-columns: auto auto;
+        justify-content: center;
+        gap: 12px 16px;
+    }
+
+    /* ロゴは中央で1行使う */
+    .site-brand {
+        grid-column: 1 / -1;
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* 検索窓も1行全部使う */
+    .keyword-search-box {
+        grid-column: 1 / -1;
+        width: 100%;
+    }
+
+    /* 閲覧履歴・お気に入りを中央に2個並べる */
+    #history-open-button {
+        justify-self: end;
+    }
+
+    #favorite-open-button {
+        justify-self: start;
+    }
+
+
+    /* 選択中サイト＋検索サイトボタン */
+    .selected-sites-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+    }
+
+    /* 選択中サイトは横幅いっぱい */
+    .selected-sites-fieldset {
+        width: 100%;
+    }
+
+    /* 検索サイトを選ぶボタンは中央 */
+    .site-select-details {
+        align-self: center;
+        margin-bottom: 18px;
+    }
+
+
+    /* 表示方法・並び順・検索精度を縦に並べる */
+    .search-option-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    /* 各設定を1行ずつ使う */
+    .search-option-item {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+
+        /* 設定項目全体を少し右へ */
+        padding-left: 18px;
+        box-sizing: border-box;
+    }
+
+    /* ラベル幅を揃える */
+    .search-option-item label {
+        width: 72px;
+        margin-left: 0;
+    }
+
+    /* 900px以下では設定タブの横幅を揃える */
+    #display_mode,
+    #sort,
+    #search_mode {
+        width: 225px;
+        min-width: 225px;
+    }
+
+    /* 横スクロール時に商品より手前へ表示するUI */
+    #search-form,
+    .mobile-filter-toggle,
+    .filter-sidebar.mobile-open,
+    .result-heading-row,
+    .pagination {
+        position: relative;
+        z-index: 20;
+        background: #fafafa;
+    }
+
+    /* 上部広告・フッターは画面幅以内に収めて横追従 */
+    .top-ad-area,
+    footer {
+        width: calc(100vw - 32px);
+        max-width: calc(100vw - 32px);
+        box-sizing: border-box;
+
+        position: relative;
+        z-index: 20;
+        background: #fafafa;
+    }
+
+}
+

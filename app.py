@@ -168,6 +168,10 @@ def index():
     search_mode = request.args.get("search_mode", "standard")
     # 表示方法の初期値は「サイト別比較」
     display_mode = request.args.get("display_mode", "compare")
+    # 送料込みだけに絞るか
+    postage_only = request.args.get("postage_only") == "1"
+    # ポイントアップ商品だけに絞るか
+    point_up_only = request.args.get("point_up_only") == "1"
     # 検索結果を表示するサイトの絞り込み
     result_site = request.args.get("result_site", "all")
     # 価格上限下限の設定
@@ -238,6 +242,20 @@ def index():
                     exclude_keywords_text=exclude_keywords_text,
                     search_mode=search_mode,
                 )
+                # 「送料込みのみ」が選ばれていたら絞り込む
+                if postage_only:
+                    products = [
+                        product
+                        for product in products
+                        if product.get("postage") == 0
+                    ]
+                    # 「ポイントアップのみ」が選ばれていたら絞り込む
+                    if point_up_only:
+                        products = [
+                            product
+                            for product in products
+                            if (product.get("point_rate") or 0) > 1
+                        ]
                 # APIから商品を取得できたら検索IDを作ってDBに保存
                 if products:
                     search_id = uuid.uuid4().hex
@@ -472,6 +490,7 @@ if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000)
 
 # 実行後　http://127.0.0.1:5000 をブラウザに入力
+
 
 
 
