@@ -1385,6 +1385,9 @@ border-color: #666;
 
     width: 100%;
     box-sizing: border-box;
+
+    /* 広告を少し左へ */
+    transform: translateX(-3px);
 }
 
 /* 広告画像がサイドバーからはみ出さないようにする */
@@ -1936,6 +1939,13 @@ background-color: #ebebeb;
         padding: 16px;
     }
 
+    /* 900px以下ではページ全体を横スクロールさせない */
+    html,
+    body {
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
     /* 上段を折り返せるようにする */
     .search-main-row {
         flex-wrap: wrap;
@@ -1983,6 +1993,13 @@ background-color: #ebebeb;
     .content-layout {
         grid-template-columns: 1fr;
         gap: 20px;
+    }
+
+    /* サイト別比較の商品部分だけ横スクロール */
+    .compare-grid {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
     }
 
     /* スマホでは絞り込みを固定しない */
@@ -2131,28 +2148,7 @@ background-color: #ebebeb;
         min-width: 225px;
     }
 
-    /* 横スクロール時に商品より手前へ表示するUI */
-    #search-form,
-    .mobile-filter-toggle,
-    .filter-sidebar.mobile-open,
-    .result-heading-row,
-    .pagination {
-        position: relative;
-        z-index: 20;
-        background: #fafafa;
-    }
 
-    /* 上部広告・フッターは画面幅以内に収めて横追従 */
-    .top-ad-area,
-    footer {
-        width: calc(100vw - 32px);
-        max-width: calc(100vw - 32px);
-        box-sizing: border-box;
-
-        position: relative;
-        z-index: 20;
-        background: #fafafa;
-    }
 
 }
 

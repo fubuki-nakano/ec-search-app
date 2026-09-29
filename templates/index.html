@@ -1747,8 +1747,7 @@
       const filterSidebar =
           document.querySelector(".filter-sidebar");
 
-      const pagination =
-          document.querySelector(".pagination");
+
 
       if (mobileFilterToggle && filterSidebar) {
           mobileFilterToggle.addEventListener("click", function() {
@@ -1764,8 +1763,6 @@
                   isOpen
               );
 
-              // 開いた瞬間にも現在の横スクロール位置を反映
-              keepMobileHeaderVisible();
 
           });
       }
@@ -1906,118 +1903,7 @@
         historyOverlay.classList.remove("open");
       });
 
-      // 900px以下では検索エリアを横スクロールに追従させる
-      const searchForm = document.getElementById("search-form");
-      const mobileFilterButton =
-        document.getElementById("mobile-filter-toggle");
-      const resultHeadingRow =
-        document.querySelector(".result-heading-row");
-      // 上部広告
-      const topAdArea =
-          document.querySelector(".top-ad-area");
 
-      // 一番下のサービス表記
-      const pageFooter =
-          document.querySelector("footer");
-      // 900px以下では必要な部分だけ横スクロールに追従させる
-      function keepMobileHeaderVisible() {
-
-          if (window.innerWidth <= 900) {
-
-              const scrollX = window.scrollX;
-
-              // 検索エリア
-              if (searchForm) {
-                  searchForm.style.transform =
-                      `translateX(${scrollX}px)`;
-              }
-
-              // 絞り込みタブ
-              if (mobileFilterButton) {
-                  mobileFilterButton.style.transform =
-                      `translateX(${scrollX}px)`;
-              }
-
-              // 開いている絞り込み欄
-              if (
-                  filterSidebar &&
-                  filterSidebar.classList.contains("mobile-open")
-              ) {
-                  filterSidebar.style.transform =
-                      `translateX(${scrollX}px)`;
-              }
-
-              // 検索結果件数・表示件数
-              if (resultHeadingRow) {
-                  resultHeadingRow.style.transform =
-                      `translateX(${scrollX}px)`;
-              }
-
-              // ページング
-              if (pagination) {
-                  pagination.style.transform =
-                      `translateX(${scrollX}px)`;
-              }
-
-              // 上部広告
-              if (topAdArea) {
-                  topAdArea.style.transform =
-                      `translateX(${scrollX}px)`;
-              }
-
-              // 一番下のサービス表記
-              if (pageFooter) {
-                  pageFooter.style.transform =
-                      `translateX(${scrollX}px)`;
-              }
-
-          } else {
-
-              // PC表示に戻ったら追従を解除
-              if (searchForm) {
-                  searchForm.style.transform = "";
-              }
-
-              if (mobileFilterButton) {
-                  mobileFilterButton.style.transform = "";
-              }
-
-              if (filterSidebar) {
-                  filterSidebar.style.transform = "";
-              }
-
-              if (resultHeadingRow) {
-                  resultHeadingRow.style.transform = "";
-              }
-
-              if (pagination) {
-                  pagination.style.transform = "";
-              }
-
-              if (topAdArea) {
-                  topAdArea.style.transform = "";
-              }
-
-              if (pageFooter) {
-                  pageFooter.style.transform = "";
-              }
-          }
-      }
-
-      // 横スクロールした時
-      window.addEventListener(
-          "scroll",
-          keepMobileHeaderVisible
-      );
-
-      // 画面幅を変えた時
-      window.addEventListener(
-          "resize",
-          keepMobileHeaderVisible
-      );
-
-      // 最初の表示時
-      keepMobileHeaderVisible();
     </script>
   </body>
 </html>
