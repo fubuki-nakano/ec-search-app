@@ -5,7 +5,12 @@
     <meta charset="utf-8">
     <!--画面表示設定-->
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>商品比較検索</title>
+    <title>コムパロ｜価格比較サイト</title>
+    <link
+      rel="icon"
+      type="image/png"
+      href="{{ url_for('static', filename='images/compallow_icon.png') }}"
+    >
     <!--CSS読み込み-->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   </head>
@@ -27,17 +32,19 @@
       <!-- 1段目：商品検索 -->
       <div class="search-main-row">
 
-        <!-- サイト名 -->
+        <!-- サイトロゴ -->
         <div class="site-brand">
 
-          <!-- 仮のサイトアイコン -->
-          <div class="site-brand-icon">
-            <span class="brand-search-icon"></span>
-          </div>
-
-          <span class="site-brand-name">
-            商品比較検索
-          </span>
+          <a
+            href="{{ url_for('index') }}"
+            class="site-brand-link"
+          >
+            <img
+              src="{{ url_for('static', filename='images/compallow_logo.png') }}"
+              alt="価格比較サイト .compallow コムパロ"
+              class="site-brand-logo"
+            >
+          </a>
 
         </div>
 
@@ -228,7 +235,29 @@
               <select
                 id="sort"
                 name="sort"
+                {% if search_id %}
+                  onchange="
+                    const sortParams =
+                      new URLSearchParams(window.location.search);
+
+                    sortParams.set(
+                      'search_id',
+                      '{{ search_id }}'
+                    );
+
+                    sortParams.set(
+                      'sort',
+                      this.value
+                    );
+
+                    sortParams.set('page', '1');
+
+                    window.location.search =
+                      sortParams.toString();
+                  "
+                {% endif %}
               >
+
                 {% for value, label in sorts.items() %}
                   <option
                     value="{{ value }}"
@@ -243,46 +272,7 @@
 
 
             <!-- 表示件数 -->
-            <div class="search-option-item">
 
-              <label for="limit">表示件数</label>
-
-              <select
-                id="limit"
-                name="limit"
-                {% if search_id %}
-                  onchange="
-                    const params =
-                      new URLSearchParams(window.location.search);
-
-                    params.set(
-                      'search_id',
-                      '{{ search_id }}'
-                    );
-
-                    params.set(
-                      'limit',
-                      this.value
-                    );
-
-                    params.set('page', '1');
-
-                    window.location.search =
-                      params.toString();
-                  "
-                {% endif %}
-              >
-                {% for value in limits %}
-                  <option
-                    value="{{ value }}"
-                    {% if value|string == limit %}selected{% endif %}
-                  >
-                    {{ value }}件
-                  </option>
-                {% endfor %}
-              </select>
-
-            </div>
 
           </div>
 
@@ -430,7 +420,7 @@
 
           <!-- サイドバー広告 -->
           <div class="sidebar-ad-area">
-            <script type="text/javascript">rakuten_design="slide";rakuten_affiliateId="57e0e905.41d0cb78.57e0e906.1dde0fa1";rakuten_items="ctsmatch";rakuten_genreId="0";rakuten_size="250x250";rakuten_target="_blank";rakuten_theme="gray";rakuten_border="off";rakuten_auto_mode="on";rakuten_genre_title="off";rakuten_recommend="on";rakuten_ts="1790301591097";</script><script type="text/javascript" src="https://xml.affiliate.rakuten.co.jp/widget/js/rakuten_widget.js?20230106"></script>
+            <a href="https://hb.afl.rakuten.co.jp/hsc/57fa333e.c818cab4.57e0d11e.8401fa39/?link_type=pict&ut=eyJwYWdlIjoic2hvcCIsInR5cGUiOiJwaWN0IiwiY29sIjoxLCJjYXQiOiIxMDIiLCJiYW4iOjMyNzQwMDQsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style="word-wrap:break-word;"><img src="https://hbb.afl.rakuten.co.jp/hsb/57fa333e.c818cab4.57e0d11e.8401fa39/?me_id=1&me_adv_id=3274004&t=pict" border="0" style="margin:2px" alt="" title=""></a>
           
 
         </aside>
@@ -445,7 +435,56 @@
       <!--検索した後かどうか-->
 {% if searched %}
 
-        <h2>検索結果：全{{ total_products }}件</h2>
+        <!-- 検索結果件数と表示件数 -->
+        <div class="result-heading-row">
+
+          <h2>
+            検索結果：全{{ total_products }}件
+          </h2>
+
+          {% if display_mode != "same_product" %}
+
+            <div class="result-limit-control">
+
+              <label for="limit">
+                表示件数
+              </label>
+
+              <select
+                id="limit"
+                name="limit"
+                form="search-form"
+                {% if search_id %}
+                  onchange="
+                    const params =
+                      new URLSearchParams(window.location.search);
+
+                    params.set('search_id', '{{ search_id }}');
+                    params.set('limit', this.value);
+                    params.set('page', '1');
+
+                    window.location.search =
+                      params.toString();
+                  "
+                {% endif %}
+              >
+
+                {% for value in limits %}
+                  <option
+                    value="{{ value }}"
+                    {% if value|string == limit %}selected{% endif %}
+                  >
+                    {{ value }}件
+                  </option>
+                {% endfor %}
+
+              </select>
+
+            </div>
+
+          {% endif %}
+
+        </div>
 
         <!-- 商品一覧のサイト絞り込み -->
         {% if display_mode == "list" and search_id %}
@@ -482,13 +521,9 @@
           <!-- 価格順一覧 -->
           {% if display_mode == "list" %}
 
-            <p>
-            <p>
-              商品価格を基準に比較しています。
-              送料・ポイントは価格の並び順には含みません。
-              最新の価格・送料・ポイントは商品ページで確認してください。
-            </p>
-            </p>
+            <p>送料・ポイントは価格の並び順には含みません。</p>
+            <p>最新の価格・送料・ポイントは商品ページで確認してください。</p>
+
 
             <div class="table-wrap">
 
@@ -500,7 +535,6 @@
                     <th scope="col">商品名</th>
                     <th scope="col">価格・評価・ポイント</th>
                     <th scope="col">ショップ・サイト</th>
-                    <th scope="col">お気に入り</th>
                   </tr>
                 </thead>
 
@@ -530,7 +564,20 @@
 
                         {% endif %}
 
-                      </td>
+                      <!-- 商品画像の下にお気に入り -->
+                      <button
+                        type="button"
+                        class="favorite-button list-favorite-button"
+                        data-name="{{ product.name }}"
+                        data-price="{{ product.price }}"
+                        data-image="{{ product.image }}"
+                        data-site="{{ product.site }}"
+                        data-url="{{ product.url }}"
+                      >
+                        ☆ お気に入り
+                      </button>
+
+                    </td>
 
 
                       <!-- 商品名 -->
@@ -629,22 +676,6 @@
                       </td>
 
 
-                      <!-- お気に入り -->
-                      <td>
-
-                        <button
-                          type="button"
-                          class="favorite-button"
-                          data-name="{{ product.name }}"
-                          data-price="{{ product.price }}"
-                          data-image="{{ product.image }}"
-                          data-site="{{ product.site }}"
-                          data-url="{{ product.url }}"
-                        >
-                          ☆ お気に入り
-                        </button>
-
-                      </td>
 
                     </tr>
 
@@ -660,7 +691,7 @@
           {% elif display_mode == "compare" %}
 
             <p>
-              サイトごとに商品を比較しています。
+              サイトごとに商品を表示しています。
             </p>
 
             <div class="compare-grid">
@@ -1319,7 +1350,7 @@
               // 登録済みなら⭐、未登録なら☆
               if (isFavorite) {
 
-                  button.textContent = "⭐";
+                  button.textContent = "⭐お気に入り";
                   button.setAttribute(
                       "aria-label",
                       "お気に入りから削除"
@@ -1345,7 +1376,7 @@
       updateFavoriteButtons();
 
       function displayHistory() {
-        const history = JSON.parse(sessionStorage.getItem("viewHistory")) || [];
+        const history = JSON.parse(localStorage.getItem("viewHistory")) || [];
 
         if (history.length === 0) {
           historyList.innerHTML = "<p>まだ閲覧履歴はありません。</p>";
@@ -1496,7 +1527,7 @@
 
           console.log(product);
 
-          let history = JSON.parse(sessionStorage.getItem("viewHistory")) || [];
+          let history = JSON.parse(localStorage.getItem("viewHistory")) || [];
 
           history = history.filter(function(item) {
             return item.url !== product.url;
@@ -1506,7 +1537,7 @@
 
           history = history.slice(0, 30);
 
-          sessionStorage.setItem("viewHistory", JSON.stringify(history));
+          localStorage.setItem("viewHistory", JSON.stringify(history));
         });
       });
 
@@ -1555,7 +1586,7 @@
             // お気に入りは最大100件
             favorites = favorites.slice(0, 100);
 
-            button.textContent = "⭐";
+            button.textContent = "⭐お気に入り";
             button.setAttribute("aria-label", "お気に入りから削除");
 
             // ⭐にカーソルを置いた時だけ表示
@@ -1581,7 +1612,7 @@
       });
 
       historyClearButton.addEventListener("click", function() {
-        sessionStorage.removeItem("viewHistory");
+        localStorage.removeItem("viewHistory");
         displayHistory();
       });
 
