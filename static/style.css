@@ -1886,6 +1886,20 @@ background-color: #ebebeb;
     margin: 0;
 }
 
+/* PCでは今までと同じ並びにする */
+.same-product-scroll {
+    display: contents;
+}
+
+/* 通常はPC広告を表示 */
+.bottom-ad-pc {
+    display: block;
+}
+
+.bottom-ad-mobile {
+    display: none;
+}
+
 /* =========================
    タブレット・少し狭いPC
    ========================= */
@@ -2148,6 +2162,149 @@ background-color: #ebebeb;
         min-width: 225px;
     }
 
+    /* 商品一覧をスマホでは2列表示にする */
+    .table-wrap thead {
+        display: none;
+    }
+
+    .table-wrap table,
+    .table-wrap tbody {
+        display: block;
+        width: 100%;
+    }
+
+    /* 商品一覧をスマホ用の配置にする */
+    .table-wrap tbody tr {
+        display: grid;
+        grid-template-columns: 160px minmax(0, 1fr);
+        grid-template-rows: auto auto auto;
+        width: 100%;
+
+        /* 商品ごとの間隔を空ける */
+        margin-bottom: 14px;
+
+        /* 商品ごとに薄い影をつける */
+        box-shadow: 0 2px 7px rgba(0, 0, 0, 0.10);
+    }
+
+    .table-wrap tbody tr:last-child {
+        margin-bottom: 0;
+    }
+
+    /* 画像：左上に配置 */
+    .table-wrap tbody td:nth-child(1) {
+        grid-column: 1;
+        grid-row: 1 / 3;
+    }
+
+    /* 商品名：右上 */
+    .table-wrap tbody td:nth-child(2) {
+        grid-column: 2;
+        grid-row: 1;
+
+        /* 商品名とショップ欄をつなげて見せる */
+        border-bottom: none;
+    }
+
+    /* ショップ・サイト：商品名の下 */
+    .table-wrap tbody td:nth-child(4) {
+        grid-column: 2;
+        grid-row: 2;
+
+        border-top: none;
+    }
+
+    /* 価格・評価など：下段を横いっぱい使う */
+    .table-wrap tbody td:nth-child(3) {
+        grid-column: 1 / -1;
+        grid-row: 3;
+    }
+
+    /* PC用の列幅をスマホでは解除 */
+    .table-wrap tbody td:nth-child(1),
+    .table-wrap tbody td:nth-child(2),
+    .table-wrap tbody td:nth-child(3),
+    .table-wrap tbody td:nth-child(4) {
+        width: auto;
+        max-width: none;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    /* 商品一覧の商品名は2行まで表示 */
+    .table-wrap tbody td:nth-child(2) .compare-title-link {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        overflow: hidden;
+
+        line-height: 1.5;
+        max-height: 3em;
+        overflow-wrap: anywhere;
+    }
+
+    /* 商品一覧の価格情報を2列×2段にする */
+    .table-wrap tbody td:nth-child(3) {
+        display: grid;
+        grid-template-columns: 160px minmax(0, 1fr);
+        grid-template-areas:
+            "price rating"
+            "postage point";
+        column-gap: 16px;
+        row-gap: 8px;
+        align-items: center;
+
+        /* 下段全体を少し右へ */
+        padding-left: 28px;
+    }
+
+    /* 価格と送料の親要素をGrid上では透明化 */
+    .table-wrap tbody td:nth-child(3) .compare-price-row {
+        display: contents;
+    }
+
+    /* 価格 */
+    .table-wrap tbody td:nth-child(3) .compare-price {
+        grid-area: price;
+    }
+
+    /* 送料 */
+    .table-wrap tbody td:nth-child(3) .compare-postage {
+        grid-area: postage;
+        white-space: nowrap;
+    }
+
+    /* 評価 */
+    .table-wrap tbody td:nth-child(3) .compare-rating {
+        grid-area: rating;
+        margin: 0;
+    }
+
+    /* ポイント */
+    .table-wrap tbody td:nth-child(3) > p {
+        grid-area: point;
+        margin: 0;
+    }
+
+    /* 同一商品比較は商品カード部分だけ横スクロール */
+.same-product-scroll {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+
+    padding-bottom: 8px;
+}
+
+/* スマホではカード本来の横幅を確保する */
+.same-product-scroll .same-product-wrapper {
+    flex: 0 0 400px;
+    max-width: 400px;
+}
 
 
 }

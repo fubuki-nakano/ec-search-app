@@ -949,6 +949,10 @@
                   {{ group.match_type }}：{{ group.match_value }}
                   　商品：{{ group.products|length }}件
                 </h3>
+
+                <!-- スマホでは商品カード部分だけ横スクロール -->
+                <div class="same-product-scroll">
+
                 <!-- 同じ型番の商品を表示 -->
                 {% for product in group.products %}
 
@@ -1097,6 +1101,7 @@
                       <!-- ↑ same-product-wrapper を閉じる -->
 
                       {% endfor %}
+                  </div>
 
               </section>
 
@@ -1245,27 +1250,45 @@
       <!-- 検索後だけ表示する広告 -->
       {% if searched %}
 
-        <div class="bottom-ad-area">
+        <!-- 検索後の楽天広告 -->
+        <div class="bottom-ad-area" id="bottom-rakuten-ad">
 
-          <!-- 楽天広告 -->
           <script type="text/javascript">
-            rakuten_design="slide";
-            rakuten_affiliateId="57e0e905.41d0cb78.57e0e906.1dde0fa1";
-            rakuten_items="ranking";
-            rakuten_genreId="0";
-            rakuten_size="728x90";
-            rakuten_target="_blank";
-            rakuten_theme="gray";
-            rakuten_border="off";
-            rakuten_auto_mode="on";
-            rakuten_genre_title="off";
-            rakuten_recommend="off";
-            rakuten_ts="1790303730312";
-          </script>
+            /* 900px以下ならスマホ用広告 */
+            if (window.innerWidth <= 900) {
+              rakuten_design = "slide";
+              rakuten_affiliateId = "57e0e905.41d0cb78.57e0e906.1dde0fa1";
+              rakuten_items = "ctsmatch";
+              rakuten_genreId = "0";
+              rakuten_size = "300x160";
+              rakuten_target = "_blank";
+              rakuten_theme = "gray";
+              rakuten_border = "off";
+              rakuten_auto_mode = "on";
+              rakuten_genre_title = "off";
+              rakuten_recommend = "on";
+              rakuten_ts = "1790731180832";
 
-          <script
-            type="text/javascript"
-            src="https://xml.affiliate.rakuten.co.jp/widget/js/rakuten_widget.js?20230106">
+            /* 901px以上ならPC用広告 */
+            } else {
+              rakuten_design = "slide";
+              rakuten_affiliateId = "57e0e905.41d0cb78.57e0e906.1dde0fa1";
+              rakuten_items = "ranking";
+              rakuten_genreId = "0";
+              rakuten_size = "728x90";
+              rakuten_target = "_blank";
+              rakuten_theme = "gray";
+              rakuten_border = "off";
+              rakuten_auto_mode = "on";
+              rakuten_genre_title = "off";
+              rakuten_recommend = "off";
+              rakuten_ts = "1790303730312";
+            }
+
+            /* 選ばれた広告だけ楽天のスクリプトで読み込む */
+            document.write(
+              '<script type="text/javascript" src="https://xml.affiliate.rakuten.co.jp/widget/js/rakuten_widget.js?20230106"><\/script>'
+            );
           </script>
 
         </div>
