@@ -99,7 +99,7 @@
           class="top-option-button"
         >
           <span class="top-option-icon favorite-icon">☆</span>
-          <span class="top-option-label">お気に入り</span>
+          <span class="top-option-label">気になる</span>
         </button>
         
       </div>
@@ -605,8 +605,8 @@
           <!-- 価格順一覧 -->
           {% if display_mode == "list" %}
 
-            <p>送料・ポイントは価格の並び順には含みません。</p>
-            <p>最新の価格・送料・ポイントは商品ページで確認してください。</p>
+            <p class="display-note">送料・ポイントは価格の並び順には含みません。</p>
+            <p class="display-note">最新の価格・送料・ポイントは商品ページで確認してください。</p>
 
 
             <div class="table-wrap">
@@ -648,7 +648,7 @@
 
                         {% endif %}
 
-                      <!-- 商品画像の下にお気に入り -->
+                      <!-- 商品画像の下に気になる -->
                       <button
                         type="button"
                         class="favorite-button list-favorite-button"
@@ -658,7 +658,7 @@
                         data-site="{{ product.site }}"
                         data-url="{{ product.url }}"
                       >
-                        ☆ お気に入り
+                        ☆ 気になる
                       </button>
 
                     </td>
@@ -717,31 +717,47 @@
                         </div>
 
 
-                        <!-- 評価 -->
-                        <div class="rating-row compare-rating">
+                        <!-- 評価とポイント -->
+                        <div class="compare-bottom-row">
 
-                          <span
-                            class="star-rating"
-                            style="--rating-percent: {{ product.rating / 5 * 100 }}%;"
-                          >
-                            ★★★★★
-                          </span>
+                          <!-- 左側：星評価 + 数値 + レビュー件数 -->
+                          <div class="compare-rating-block">
 
-                          {{ product.rating }}（{{ product.review_count }}件）
+                            <div class="rating-row compare-rating">
+
+                              <span
+                                class="star-rating"
+                                style="--rating-percent: {{ product.rating / 5 * 100 }}%;"
+                              >
+                                ★★★★★
+                              </span>
+
+                              <span class="rating-value">
+                                {{ product.rating }}
+                              </span>
+
+                            </div>
+
+                            <!-- レビュー件数は評価の下 -->
+                            <p class="compare-review-count">
+                              （{{ product.review_count }}件）
+                            </p>
+
+                          </div>
+
+
+                          <!-- 右側：ポイント -->
+                          <p class="compare-point">
+
+                            {% if product.point_rate %}
+                              ポイント：{{ "{:g}".format(product.point_rate) }}倍
+                            {% else %}
+                              ポイント：－
+                            {% endif %}
+
+                          </p>
 
                         </div>
-
-
-                        <!-- ポイント -->
-                        <p>
-
-                          {% if product.point_rate %}
-                            ポイント：{{ "{:g}".format(product.point_rate) }}倍
-                          {% else %}
-                            ポイント：－
-                          {% endif %}
-
-                        </p>
 
                       </td>
 
@@ -774,7 +790,7 @@
           <!-- サイト別比較 -->
           {% elif display_mode == "compare" %}
 
-            <p>
+            <p class="display-note">
               サイトごとに商品を表示しています。
             </p>
 
@@ -793,7 +809,7 @@
 
                       <div class="compare-item">
 
-                        <!-- 上段：画像 / お気に入り / ショップ -->
+                        <!-- 上段：画像 / 気になる / ショップ -->
                         <div class="compare-top-row">
 
                           <!-- 商品画像 -->
@@ -815,7 +831,7 @@
                           <!-- 右上 -->
                           <div class="compare-top-info">
 
-                            <!-- お気に入り -->
+                            <!-- 気になる -->
                             <button
                               type="button"
                               class="favorite-button"
@@ -825,7 +841,7 @@
                               data-site="{{ product.site }}"
                               data-url="{{ product.url }}"
                             >
-                              ☆ お気に入り
+                              ☆ 気になる
                             </button>
 
                             <!-- ショップ名 -->
@@ -901,7 +917,7 @@
                         </div>
 
 
-                        <!-- 下段：ポイント / 商品ページ -->
+                        <!-- ポイント -->
                         <div class="compare-bottom-row">
 
                           <p class="compare-point">
@@ -933,8 +949,8 @@
           <!-- 同一商品比較 -->
           {% elif display_mode == "same_product" %}
 
-            <p>
-              JANコードや型番が一致した同一商品候補を比較しています。
+            <p class="display-note">
+              JANコードや型番が一致した同一商品候補を比較しています。<br>
               商品名から自動判定しているため、異なる商品が含まれる場合があります。<br>
               必要に応じて除外キーワードで検索結果を絞り込んでください。
             </p>
@@ -966,7 +982,7 @@
 
                     <div class="same-product-item{% if loop.first %} lowest-item{% endif %}">
 
-                      <!-- 上段：画像 / お気に入り / サイト・ショップ -->
+                      <!-- 上段：画像 / 気になる / サイト・ショップ -->
                       <div class="compare-top-row">
 
                         <!-- 商品画像 -->
@@ -988,7 +1004,7 @@
                         <!-- 右上 -->
                         <div class="compare-top-info">
 
-                          <!-- お気に入り -->
+                          <!-- 気になる -->
                           <button
                             type="button"
                             class="favorite-button"
@@ -998,7 +1014,7 @@
                             data-site="{{ product.site }}"
                             data-url="{{ product.url }}"
                           >
-                            ☆ お気に入り
+                            ☆ 気になる
                           </button>
 
                           <!-- サイト名 -->
@@ -1118,7 +1134,7 @@
             <nav class="pagination">
 
               {% if page > 1 %}
-                <a href="{{ url_for(
+                <a class="page-arrow" href="{{ url_for(
                   'index',
                   keyword=keyword,
                   sites=selected,
@@ -1132,7 +1148,7 @@
                   result_site=result_site,
                   search_id=search_id,
                   page=page - 1
-                ) }}">← 前へ</a>
+                ) }}">&lt;</a>
               {% endif %}
 
               <!-- ページ番号 -->
@@ -1209,7 +1225,7 @@
               {% endfor %}
 
               {% if page < total_pages %}
-                <a href="{{ url_for(
+                <a class="page-arrow" href="{{ url_for(
                   'index',
                   keyword=keyword,
                   sites=selected,
@@ -1223,7 +1239,7 @@
                   result_site=result_site,
                   search_id=search_id,
                   page=page + 1
-                ) }}">次へ →</a>
+                ) }}">&gt;</a>
               {% endif %}
 
             </nav>
@@ -1235,10 +1251,49 @@
       {% else %}
       <p>サイトを選び、商品名を入力して検索してください。</p>
       <!-- 検索前に表示する広告 -->
-      <div class="result-ad-area">
+      <div class="result-ad-area" id="result-rakuten-ad">
 
-        <!-- ↓ここに楽天からコピーした広告ソース -->
-        <script type="text/javascript">rakuten_design="slide";rakuten_affiliateId="57e0e905.41d0cb78.57e0e906.1dde0fa1";rakuten_items="ctsmatch";rakuten_genreId="0";rakuten_size="728x200";rakuten_target="_blank";rakuten_theme="gray";rakuten_border="off";rakuten_auto_mode="on";rakuten_genre_title="off";rakuten_recommend="on";rakuten_ts="1790303124354";</script><script type="text/javascript" src="https://xml.affiliate.rakuten.co.jp/widget/js/rakuten_widget.js?20230106"></script>
+        <script type="text/javascript">
+
+          /* 900px以下ならスマホ用広告 */
+          if (window.innerWidth <= 900) {
+
+            rakuten_design = "slide";
+            rakuten_affiliateId = "57e0e905.41d0cb78.57e0e906.1dde0fa1";
+            rakuten_items = "ctsmatch";
+            rakuten_genreId = "0";
+            rakuten_size = "300x160";
+            rakuten_target = "_blank";
+            rakuten_theme = "gray";
+            rakuten_border = "off";
+            rakuten_auto_mode = "on";
+            rakuten_genre_title = "off";
+            rakuten_recommend = "on";
+            rakuten_ts = "1790731180832";
+
+          /* 901px以上ならPC用広告 */
+          } else {
+
+            rakuten_design = "slide";
+            rakuten_affiliateId = "57e0e905.41d0cb78.57e0e906.1dde0fa1";
+            rakuten_items = "ctsmatch";
+            rakuten_genreId = "0";
+            rakuten_size = "728x200";
+            rakuten_target = "_blank";
+            rakuten_theme = "gray";
+            rakuten_border = "off";
+            rakuten_auto_mode = "on";
+            rakuten_genre_title = "off";
+            rakuten_recommend = "on";
+            rakuten_ts = "1790303124354";
+          }
+
+          /* 選ばれた広告だけ読み込む */
+          document.write(
+            '<script type="text/javascript" src="https://xml.affiliate.rakuten.co.jp/widget/js/rakuten_widget.js?20230106"><\/script>'
+          );
+
+        </script>
 
       </div>
       {% endif %}
@@ -1310,19 +1365,23 @@
       <aside id="history-sidebar" class="history-sidebar">
 
         <div class="history-header">
-          <h2>最近見た商品</h2>
+
+          <div class="history-title-row">
+            <h2>最近見た商品</h2>
+
+            <button
+              type="button"
+              id="history-close-button"
+              aria-label="閲覧履歴を閉じる"
+            >
+              ×
+            </button>
+          </div>
 
           <button type="button" id="history-clear-button">
             履歴を削除
           </button>
 
-          <button
-            type="button"
-            id="history-close-button"
-            aria-label="閲覧履歴を閉じる"
-          >
-            ×
-          </button>
         </div>
 
         <div id="history-list">
@@ -1330,28 +1389,32 @@
         </div>
 
       </aside>
-      <!-- お気に入りサイドバー -->
+      <!-- 気になるサイドバー -->
       <aside id="favorite-sidebar" class="history-sidebar">
 
         <div class="history-header">
-          <h2>お気に入り</h2>
 
-          <!-- お気に入りをすべて削除するボタン -->
+          <div class="history-title-row">
+            <h2>気になる商品</h2>
+
+            <button
+              type="button"
+              id="favorite-close-button"
+              aria-label="気になるを閉じる"
+            >
+              ×
+            </button>
+          </div>
+
+          <!-- 気になるをすべて削除するボタン -->
           <button type="button" id="favorite-clear-button">
-            すべて削除
+            気になるをすべて削除
           </button>
 
-          <button
-            type="button"
-            id="favorite-close-button"
-            aria-label="お気に入りを閉じる"
-          >
-            ×
-          </button>
         </div>
 
         <div id="favorite-list">
-          <p>まだお気に入りはありません。</p>
+          <p>まだ気になっている商品はありません。</p>
         </div>
 
       </aside>
@@ -1365,14 +1428,14 @@
       const productLinks = document.querySelectorAll(".product-link");
       const historyList = document.getElementById("history-list");
       const historyClearButton = document.getElementById("history-clear-button");
-      // お気に入りボタンをすべて取得
+      // 気になるボタンをすべて取得
       const favoriteButtons = document.querySelectorAll(".favorite-button");
-      // お気に入りサイドバー用
+      // 気になるサイドバー用
       const favoriteOpenButton = document.getElementById("favorite-open-button");
       const favoriteCloseButton = document.getElementById("favorite-close-button");
       const favoriteSidebar = document.getElementById("favorite-sidebar");
       const favoriteList = document.getElementById("favorite-list");
-      // お気に入り全削除ボタンを取得
+      // 気になる全削除ボタンを取得
       const favoriteClearButton = document.getElementById("favorite-clear-button");
       // 検索サイト選択用
       const siteCheckboxes = document.querySelectorAll(".site-checkbox");
@@ -1442,7 +1505,7 @@
               return checkbox.checked;
           });
 
-      // 保存済みのお気に入りを確認してボタン表示を変更
+      // 保存済みの気になるを確認してボタン表示を変更
       function updateFavoriteButtons() {
 
           const favorites =
@@ -1450,7 +1513,7 @@
 
           favoriteButtons.forEach(function(button) {
 
-              // この商品がお気に入りに入っているか確認
+              // この商品が気になるに入っているか確認
               const isFavorite = favorites.some(function(item) {
                   return item.url === button.dataset.url;
               });
@@ -1458,21 +1521,21 @@
               // 登録済みなら⭐、未登録なら☆
               if (isFavorite) {
 
-                  button.textContent = "⭐お気に入り";
+                  button.textContent = "⭐気になる";
                   button.setAttribute(
                       "aria-label",
-                      "お気に入りから削除"
+                      "気になるから削除"
                   );
-                  button.title = "お気に入りから削除";
+                  button.title = "気になるから削除";
 
               } else {
 
-                  button.textContent = "☆お気に入り";
+                  button.textContent = "☆気になる";
                   button.setAttribute(
                       "aria-label",
-                      "お気に入りに追加"
+                      "気になるに追加"
                   );
-                  button.title = "お気に入りに追加";
+                  button.title = "気になるに追加";
 
               }
 
@@ -1480,7 +1543,7 @@
 
       }
 
-      // ページを開いた時にお気に入り状態を反映
+      // ページを開いた時に気になる状態を反映
       updateFavoriteButtons();
 
       function displayHistory() {
@@ -1534,15 +1597,15 @@
         });
       }
 
-      // お気に入り一覧を表示
+      // 気になる一覧を表示
       function displayFavorites() {
         const favorites =
           JSON.parse(localStorage.getItem("favorites")) || [];
 
-        // お気に入りがない場合
+        // 気になるがない場合
         if (favorites.length === 0) {
           favoriteList.innerHTML =
-            "<p>まだお気に入りはありません。</p>";
+            "<p>まだ気になる商品はありません。</p>";
           return;
         }
 
@@ -1577,13 +1640,13 @@
           siteLink.target = "_blank";
           siteLink.rel = "noopener noreferrer";
 
-          // お気に入り削除ボタン
+          // 気になる削除ボタン
           const deleteButton = document.createElement("button");
           deleteButton.type = "button";
           deleteButton.textContent = "削除";
           deleteButton.classList.add("favorite-delete-button");
 
-          // 削除ボタンを押した商品をお気に入りから削除
+          // 削除ボタンを押した商品を気になるから削除
           deleteButton.addEventListener("click", function() {
             let favorites =
               JSON.parse(localStorage.getItem("favorites")) || [];
@@ -1593,10 +1656,10 @@
               return item.url !== product.url;
             });
 
-            // 削除後のお気に入りを保存
+            // 削除後の気になるを保存
             localStorage.setItem("favorites", JSON.stringify(favorites));
 
-            // お気に入り一覧を更新
+            // 気になる一覧を更新
             displayFavorites();
 
             // 検索結果側の星も更新
@@ -1649,7 +1712,7 @@
         });
       });
 
-      // お気に入りボタンをクリックした時の処理
+      // 気になるボタンをクリックした時の処理
       favoriteButtons.forEach(function(button) {
         button.addEventListener("click", function() {
 
@@ -1665,43 +1728,43 @@
           // 取得した商品情報を確認
           console.log(product);
 
-          // 保存済みのお気に入りを取得
+          // 保存済みの気になるを取得
           let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
 
-          // すでにお気に入り登録されているか確認
+          // すでに気になる登録されているか確認
           const isFavorite = favorites.some(function(item) {
             return item.url === product.url;
           });
 
           if (isFavorite) {
 
-            // 登録済みならお気に入りから削除
+            // 登録済みなら気になるから削除
             favorites = favorites.filter(function(item) {
                 return item.url !== product.url;
             });
 
-            button.textContent = "☆ お気に入り";
-            button.setAttribute("aria-label", "お気に入りに追加");
+            button.textContent = "☆ 気になる";
+            button.setAttribute("aria-label", "気になるに追加");
 
             // 未登録になったので説明を消す
             button.removeAttribute("title");
 
         } else {
 
-            // 未登録ならお気に入りに追加
+            // 未登録なら気になるに追加
             favorites.unshift(product);
 
-            // お気に入りは最大100件
+            // 気になるは最大100件
             favorites = favorites.slice(0, 100);
 
-            button.textContent = "⭐お気に入り";
-            button.setAttribute("aria-label", "お気に入りから削除");
+            button.textContent = "⭐気になる";
+            button.setAttribute("aria-label", "気になるから削除");
 
             // ⭐にカーソルを置いた時だけ表示
-            button.title = "お気に入りから削除";
+            button.title = "気になるから削除";
         }
 
-          // お気に入りを保存
+          // 気になるを保存
         localStorage.setItem("favorites", JSON.stringify(favorites));
         });
       });
@@ -1712,7 +1775,7 @@
         historyOverlay.classList.add("open");
       });
 
-      // お気に入りサイドバーを開く
+      // 気になるサイドバーを開く
       favoriteOpenButton.addEventListener("click", function() {
         displayFavorites();
         favoriteSidebar.classList.add("open");
@@ -1724,13 +1787,13 @@
         displayHistory();
       });
 
-      // お気に入りをすべて削除
+      // 気になるをすべて削除
       favoriteClearButton.addEventListener("click", function() {
 
-        // 保存しているお気に入りを削除
+        // 保存している気になるを削除
         localStorage.removeItem("favorites");
 
-        // お気に入り一覧を更新
+        // 気になる一覧を更新
         displayFavorites();
 
         // 検索結果側の⭐も☆に戻す
@@ -1742,7 +1805,7 @@
         historyOverlay.classList.remove("open");
       });
 
-      // お気に入りサイドバーを閉じる
+      // 気になるサイドバーを閉じる
       favoriteCloseButton.addEventListener("click", function() {
         favoriteSidebar.classList.remove("open");
         historyOverlay.classList.remove("open");
@@ -1921,12 +1984,46 @@
       historyOverlay.addEventListener("click", function() {
         // 閲覧履歴を閉じる
         historySidebar.classList.remove("open");
-         // お気に入りサイドバーも閉じる
+         // 気になるサイドバーも閉じる
         favoriteSidebar.classList.remove("open");
         historyOverlay.classList.remove("open");
       });
+    
+    // スマホの商品一覧で、長い価格だけ文字を小さくする
+    function adjustMobilePriceSize() {
 
+      // PCでは何もしない
+      if (window.innerWidth > 900) {
+        return;
+      }
 
+      // 商品一覧の価格をすべて取得
+      const prices = document.querySelectorAll(
+        ".table-wrap tbody td:nth-child(3) .compare-price"
+      );
+
+      prices.forEach(function(price) {
+
+        // まず通常サイズに戻す
+        let fontSize = 26;
+        price.style.fontSize = fontSize + "px";
+
+        // 最小18pxまで、枠に収まるまで少しずつ縮める
+        while (
+          price.scrollWidth > price.clientWidth &&
+          fontSize > 18
+        ) {
+          fontSize -= 1;
+          price.style.fontSize = fontSize + "px";
+        }
+
+      });
+    }
+    // ページを開いた時に調整
+    adjustMobilePriceSize();
+
+    // 画面サイズが変わった時も再調整
+    window.addEventListener("resize", adjustMobilePriceSize);
     </script>
   </body>
 </html>
