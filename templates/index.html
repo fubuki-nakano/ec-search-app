@@ -57,7 +57,8 @@
             value="{{ keyword }}"
             maxlength="128"
             required
-            placeholder="商品名を入力　例：ワイヤレスイヤホン"
+            enterkeyhint="search"
+            placeholder="例：ワイヤレスイヤホン"
           >
 
           <button
@@ -1359,6 +1360,31 @@
           >
             Google Shopping via SerpApi</a>
       </footer>
+      <!-- 検索中に表示するローディング画面 -->
+      <div id="search-loading" class="search-loading">
+
+        <div class="search-loading-content">
+
+          <!-- 検索中に羽ばたくコムパロ -->
+          <video
+            class="search-loading-icon"
+            autoplay
+            muted
+            loop
+            playsinline
+          >
+            <source
+              src="{{ url_for('static', filename='images/compallow_loading.mp4') }}"
+              type="video/mp4"
+            >
+          </video>
+
+          <!-- 検索中の文字 -->
+          <p>検索中...</p>
+
+        </div>
+
+      </div>
       <!-- サイドバー表示中の背景 -->
       <div id="history-overlay" class="history-overlay"></div>
       <!-- 閲覧履歴サイドバー -->
@@ -1853,6 +1879,38 @@
           });
       }
 
+      // =========================
+      // 絞り込み条件がある時は
+      // スマホでも絞り込みを開いた状態にする
+      // =========================
+
+      if (mobileFilterToggle && filterSidebar) {
+
+        // 現在のURLパラメータを取得
+        const filterParams = new URLSearchParams(window.location.search);
+
+        // 絞り込み条件が1つでも入っているか確認
+        const hasActiveFilter =
+          filterParams.get("exclude_keywords") ||
+          filterParams.get("min_price") ||
+          filterParams.get("max_price") ||
+          filterParams.get("postage_only") === "1" ||
+          filterParams.get("point_up_only") === "1";
+
+        // スマホで絞り込み中なら開いた状態にする
+        if (window.innerWidth <= 900 && hasActiveFilter) {
+
+          filterSidebar.classList.add("mobile-open");
+
+          mobileFilterToggle.textContent = "絞り込み ▲";
+
+          mobileFilterToggle.setAttribute(
+            "aria-expanded",
+            "true"
+          );
+        }
+      }
+
       // 絞り込み欄ではEnterキーで送信しない
       filterForm.addEventListener("keydown", function(event) {
 
@@ -2024,6 +2082,135 @@
 
     // 画面サイズが変わった時も再調整
     window.addEventListener("resize", adjustMobilePriceSize);
+
+    // 商品検索欄で入力した文字を確定したら検索する
+    const keywordInput = document.getElementById("keyword");
+    const searchForm = document.getElementById("search-form");
+
+    let keywordBeforeEdit = "";
+
+    // キーボードの検索ボタンから送信したか判定する
+    let isKeyboardSearch = false;
+
+
+    // 入力を始める前の商品名を覚えておく
+    keywordInput.addEventListener("focus", function() {
+      keywordBeforeEdit = keywordInput.value;
+      isKeyboardSearch = false;
+    });
+
+
+    // Enter / キーボードの検索ボタンを押した時
+    keywordInput.addEventListener("keydown", function(event) {
+
+      // 日本語変換中のEnterでは検索しない
+      if (event.key === "Enter" && !event.isComposing) {
+        event.preventDefault();
+
+        // 空欄なら検索しない
+        if (keywordInput.value.trim() === "") {
+          return;
+        }
+
+        // blur側で二重送信しないための印
+        isKeyboardSearch = true;
+
+        // 先にキーボードを閉じる
+        keywordInput.blur();
+
+        // キーボードが閉じる時間を少しだけ確保してから検索
+        setTimeout(function() {
+          searchForm.requestSubmit();
+        }, 50);
+      }
+    });
+
+
+    // 入力欄の外をタップして閉じた時
+    keywordInput.addEventListener("blur", function() {
+
+      // キーボードの検索ボタンで閉じた場合は、
+      // keydown側で検索するのでここでは何もしない
+      if (isKeyboardSearch) {
+        isKeyboardSearch = false;
+        return;
+      }
+
+      // PCでは、検索欄の外をクリックしただけでは検索しない
+      if (window.innerWidth > 900) {
+        return;
+      }
+
+      const keywordAfterEdit = keywordInput.value.trim();
+
+      // スマホでは商品名を実際に変更した時だけ検索する
+      if (
+        keywordAfterEdit !== "" &&
+        keywordAfterEdit !== keywordBeforeEdit.trim()
+      ) {
+        searchForm.requestSubmit();
+      }
+    });
+
+    // =========================
+    // 検索中ローディング画面
+    // =========================
+
+    const searchLoading = document.getElementById("search-loading");
+
+    let isSearchSubmitting = false;
+
+
+    // 商品検索フォームが送信された時
+    searchForm.addEventListener("submit", function(event) {
+
+      // 二重送信を防ぐ
+      if (isSearchSubmitting) {
+        event.preventDefault();
+        return;
+      }
+
+      // HTMLのrequiredなどに引っかかっている場合は送信しない
+      if (!searchForm.checkValidity()) {
+        return;
+      }
+
+      // いったん通常の送信を止める
+      event.preventDefault();
+
+      isSearchSubmitting = true;
+
+      // スマホのキーボードを閉じる
+      keywordInput.blur();
+
+      // ローディング画面を表示
+      searchLoading.classList.add("show");
+
+      // 検索中は後ろの画面をスクロールさせない
+      document.body.style.overflow = "hidden";
+
+
+      // ローディング画面を描画してから検索を開始
+      setTimeout(function() {
+
+        // submitイベントをもう一度発生させずにフォーム送信
+        HTMLFormElement.prototype.submit.call(searchForm);
+
+      }, 80);
+
+    });
+
+
+    // 戻るボタンなどでページに戻った時はローディングを解除
+    window.addEventListener("pageshow", function() {
+
+      isSearchSubmitting = false;
+
+      searchLoading.classList.remove("show");
+
+      document.body.style.overflow = "";
+
+    });
     </script>
   </body>
 </html>

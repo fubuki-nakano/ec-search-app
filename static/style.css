@@ -2357,10 +2357,10 @@ background-color: #ebebeb;
     padding-bottom: 8px;
 }
 
-    /* スマホではカード本来の横幅を確保する */
+    /* スマホ：次の商品が少し見える幅にする */
     .same-product-scroll .same-product-wrapper {
-        flex: 0 0 400px;
-        max-width: 400px;
+        flex: 0 0 min(330px, calc(100vw - 80px));
+        max-width: min(330px, calc(100vw - 80px));
     }
 
     /* スマホでは注意書きを少しコンパクトにする */
@@ -2639,3 +2639,170 @@ background-color: #ebebeb;
         max-width: 100%;
     }
     }
+
+/* =========================
+   スマホ：商品名・ショップ・サイトの間隔調整
+   ========================= */
+@media (max-width: 900px) {
+
+    /* 商品名 */
+    .table-wrap tbody td:nth-child(2) {
+        padding: 10px 14px 4px;
+    }
+
+    /* ショップ・サイト */
+    .table-wrap tbody td:nth-child(4) {
+        padding: 4px 14px 10px;
+    }
+
+    /* ショップ名・サイト名の標準余白を消す */
+    .table-wrap tbody td:nth-child(4) p {
+        margin: 0;
+    }
+
+    /* ショップ名とサイト名の間だけ少し空ける */
+    .table-wrap tbody td:nth-child(4) p + p {
+        margin-top: 8px;
+    }
+}
+
+/* =========================
+   検索中ローディング画面
+   ========================= */
+
+/* 普段は非表示 */
+.search-loading {
+    display: none;
+
+    /* 画面全体を覆う */
+    position: fixed;
+    inset: 0;
+
+    /* 少し暗くする */
+    background: rgba(255, 255, 255, 0.78);
+
+    /* 他の要素より前面へ */
+    z-index: 9999;
+
+    /* 中央配置 */
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* 検索中だけ表示 */
+.search-loading.show {
+    display: flex;
+}
+
+
+/* アイコンと文字のまとまり */
+.search-loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 14px;
+
+    padding: 24px 32px;
+
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 16px;
+
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
+}
+
+
+/* 検索中のコムパロ */
+.search-loading-icon {
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+}
+
+
+
+/* 「検索中...」 */
+.search-loading-content p {
+    margin: 0;
+
+    font-size: 18px;
+    font-weight: bold;
+
+    color: #333;
+}
+
+/* =========================
+   PC版 商品一覧
+   価格・評価・ポイントの配置
+   ========================= */
+@media (min-width: 901px) {
+
+    /* 価格と送料を横並び */
+    .table-wrap tbody td:nth-child(3) .compare-price-row {
+        display: flex;
+        align-items: baseline;
+        gap: 16px;
+        margin-bottom: 12px;
+    }
+
+    /* 評価部分とポイントを縦に並べる */
+    .table-wrap tbody td:nth-child(3) .compare-bottom-row {
+        display: block;
+    }
+
+    /* 星・評価数・レビュー件数を横並び */
+    .table-wrap tbody td:nth-child(3) .compare-rating-block {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* 星と評価数 */
+    .table-wrap tbody td:nth-child(3) .compare-rating {
+        margin: 0;
+        white-space: nowrap;
+    }
+
+    /* レビュー件数を評価の横へ */
+    .table-wrap tbody td:nth-child(3) .compare-review-count {
+        margin: 0;
+        white-space: nowrap;
+    }
+
+    /* ポイントは次の行 */
+    .table-wrap tbody td:nth-child(3) .compare-point {
+        margin: 10px 0 0;
+        white-space: nowrap;
+        text-align: left;
+    }
+}
+
+/* =========================
+   上部広告の背景ライン
+   ========================= */
+
+.top-ad-area {
+    position: relative;
+
+    background: linear-gradient(
+        to bottom,
+        #f7f7f7 0%,
+        #ececec 50%,
+        #f7f7f7 100%
+    );
+
+    border-top: 1px solid #d9d9d9;
+    border-bottom: 1px solid #d9d9d9;
+
+    /* 元の高さ指定を解除 */
+    min-height: 0;
+
+    /* 上下の余白をコンパクトに */
+    padding: 6px 0;
+
+    /* 検索欄との間隔を狭くする */
+    margin-bottom: 8px;
+}

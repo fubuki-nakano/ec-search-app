@@ -249,13 +249,13 @@ def index():
                         for product in products
                         if product.get("postage") == 0
                     ]
-                    # 「ポイントアップのみ」が選ばれていたら絞り込む
-                    if point_up_only:
-                        products = [
-                            product
-                            for product in products
-                            if (product.get("point_rate") or 0) > 1
-                        ]
+                # 「ポイントアップのみ」が選ばれていたら絞り込む
+                if point_up_only:
+                    products = [
+                        product
+                        for product in products
+                        if (product.get("point_rate") or 0) > 1
+                    ]
                 # APIから商品を取得できたら検索IDを作ってDBに保存
                 if products:
                     search_id = uuid.uuid4().hex
