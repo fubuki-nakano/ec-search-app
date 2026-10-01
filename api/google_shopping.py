@@ -9,6 +9,7 @@ serp_api = os.getenv("SERPAPI_KEY")
 # APIの接続先
 url = "https://serpapi.com/search"
 
+
 # 検索用関数
 def search_serp(keyword, limit=5, sort="price_asc", min_price=None, max_price=None):
     """serpの検索結果を共通形式に変換して返す"""
@@ -30,11 +31,7 @@ def search_serp(keyword, limit=5, sort="price_asc", min_price=None, max_price=No
             "price_desc": 2
         }[sort]
 
-    # # 価格の上限下限を決める
-    # if min_price is not None:
-    #     params["min_price"] = min_price
-    # if max_price is not None:
-    #     params["max_price"] = max_price
+    # 価格範囲は取得後の商品に適用する。
 
     # APIと通信
     response = requests.get(url, params=params, timeout=15)

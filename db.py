@@ -33,6 +33,7 @@ def init_db():
             )
         """)
 
+
 # 保存用テーブルに保存するデータの関数
 def save_results(search_id, products):
     with get_connection() as conn:
@@ -62,6 +63,7 @@ def save_results(search_id, products):
                 ),
             )
 
+
 # search_idを指定して保存データを取得する関数
 def get_results(search_id):
     with get_connection() as conn:
@@ -76,6 +78,7 @@ def get_results(search_id):
         ).fetchall()
     return rows
 
+
 # 指定した検索結果の総件数を取得
 def count_results(search_id):
     with get_connection() as conn:
@@ -89,6 +92,7 @@ def count_results(search_id):
         ).fetchone()
 
     return row[0]
+
 
 # 指定したサイトの検索結果件数を取得
 def count_results_by_site(search_id, site_name):
@@ -105,8 +109,9 @@ def count_results_by_site(search_id, site_name):
 
     return row[0]
 
-# 指定したページの商品だけ取得
-def get_results_page(search_id, page, page_size, sort="price_asc"):
+
+# 全サイト表示とサイト別表示で同じ並び順を使う
+def get_order_by(sort):
     # 並び順をSQL用に変換
     if sort == "rating_desc":
         order_by = "rating DESC, review_count DESC"
@@ -125,6 +130,13 @@ def get_results_page(search_id, page, page_size, sort="price_asc"):
     else:
         order_by = "price ASC"
 
+    return order_by
+
+
+# 指定したページの商品だけ取得
+def get_results_page(search_id, page, page_size, sort="price_asc"):
+    order_by = get_order_by(sort)
+
     # 何件飛ばして取得を始めるか
     offset = (page - 1) * page_size
 
@@ -142,6 +154,7 @@ def get_results_page(search_id, page, page_size, sort="price_asc"):
 
     return [dict(row) for row in rows]
 
+
 # 古い検索結果をすべて削除
 def clear_results():
     with get_connection() as conn:
@@ -149,25 +162,10 @@ def clear_results():
             DELETE FROM search_results
         """)
 
+
 # 指定したサイトの商品だけページごとに取得
 def get_results_by_site(search_id, site_name, page, page_size, sort="price_asc"):
-    # 並び順をSQL用に変換
-    if sort == "rating_desc":
-        order_by = "rating DESC, review_count DESC"
-    elif sort == "review_desc":
-        order_by = "review_count DESC, rating DESC"
-    elif sort == "recommend_desc":
-        order_by = """
-            CASE
-                WHEN rating = 0 OR review_count = 0 THEN 0
-                ELSE ((review_count * rating) + (20 * 4.0))
-                    / (review_count + 20)
-            END DESC
-        """
-    elif sort == "price_desc":
-        order_by = "price DESC"
-    else:
-        order_by = "price ASC"
+    order_by = get_order_by(sort)
 
     # 何件飛ばして取得を始めるか
     offset = (page - 1) * page_size

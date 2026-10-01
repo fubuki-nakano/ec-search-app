@@ -9,6 +9,7 @@ client_id = os.getenv("YAHOO_CLIENT_ID")
 # APIの接続先
 url = "https://shopping.yahooapis.jp/ShoppingWebService/V3/itemSearch"
 
+
 # 検索用の関数
 def search_yahoo(keyword, limit=5, sort="price_asc", min_price=None, max_price=None):
     """Yahoo!の商品を既存の共通形式に変換して返す。"""
@@ -80,7 +81,7 @@ def search_yahoo(keyword, limit=5, sort="price_asc", min_price=None, max_price=N
                 "point_rate": point.get("lyLimitedBonusTimes") or 1,
             })
 
-                # 欲しい件数に到達したら商品追加を終了
+            # 欲しい件数に到達したら商品追加を終了
             if len(yahoo_results) >= limit:
                 break
 

@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request
-from api.search import SITES, search_products
-import uuid
-# 商品名から型番を探すために使用
 import re
+import uuid
+
+from flask import Flask, render_template, request
+
+from api.search import SITES, search_products
 from db import (
     init_db,
     save_results,
@@ -27,10 +28,10 @@ FETCH_LIMIT = 100
 SORTS = {
     "recommend_desc": "おすすめ順",
     "price_desc": "価格の高い順",
-    "price_asc": "価格の安い順", 
+    "price_asc": "価格の安い順",
     "rating_desc": "評価の高い順",
     "review_desc": "レビューの多い順",
-    }
+}
 # 検索精度の指定
 SEARCH_MODES = {
     "strict": "高",
@@ -44,6 +45,7 @@ DISPLAY_MODES = {
     # JANコード・型番などが一致する商品をまとめて比較
     "same_product": "同一商品比較",
 }
+
 
 # 商品名から型番らしい文字列を取り出す関数
 def extract_model_codes(product_name):
@@ -83,8 +85,9 @@ def extract_model_codes(product_name):
             and not any(word in code for word in ignore_codes)
         ):
             model_codes.append(code)
-        # 見つかった型番候補をまとめて返す
+    # 見つかった型番候補をまとめて返す
     return model_codes
+
 
 # 型番候補の中から、より型番らしいものを1つ選ぶ関数
 def select_best_model_code(product_name):
@@ -120,6 +123,7 @@ def select_best_model_code(product_name):
     # 一番型番らしい候補を返す
     return max(model_codes, key=model_score)
 
+
 # 同一商品比較から除外するアクセサリー商品を判定
 def is_accessory_product(product_name):
     name = product_name.lower()
@@ -144,8 +148,7 @@ def is_accessory_product(product_name):
         for keyword in accessory_keywords
     )
 
-# http://127.0.0.1:5000/←の/にアクセスが来たら
-# 下のindexが実行される
+# 検索条件を受け取り、検索結果を表示する
 @app.get("/")
 def index():
     # request.args にブラウザから送られてきた検索条件が入る
@@ -225,8 +228,7 @@ def index():
         # 最低価格と最高価格が逆になっていないか確認
         if min_price is not None and max_price is not None and min_price > max_price:
             errors.append("最低価格は最高価格以下にしてください。")
-        # ↑までにエラーが出ていなければ↓が実行される
-        # ここまでの指定されたものをAPIに渡す
+        # 入力が正しい場合だけ検索・保存・表示を行う
         if not errors:
             # search_idがない場合は新しい検索
             if not search_id:
@@ -363,12 +365,7 @@ def index():
                     # 同じ型番の商品を追加
                     model_groups[model_code].append(product)
 
-                    # 初めて出てきた型番なら空のリストを作る
-                    if model_code not in model_groups:
-                        model_groups[model_code] = []
-
-                        model_groups[model_code].append(product)
-                    # 2サイト以上に存在する型番だけ同一商品候補にする
+                # 型番候補は1サイトの商品だけでも表示する（現在の判定を維持）。
                 for model_code, group in model_groups.items():
 
                     # この型番の商品が存在するサイトを取得
@@ -483,20 +480,6 @@ def index():
         search_id=search_id,
     )
 
-# python app.pyが実行されたときにapp.run()が動いて
-# Flaskサーバーが起動。127.0.0.1:5000でブラウザから
-# アクセスできるようになる
+# 開発用サーバーを起動
 if __name__ == "__main__":
-    # app.run(host="127.0.0.1", port=5000)
     app.run(host="0.0.0.0", port=5000, debug=True)
-
-# 実行後　http://127.0.0.1:5000 をブラウザに入力
-
-
-
-
-
-
-
-
-

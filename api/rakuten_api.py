@@ -12,13 +12,14 @@ affiliate_id = os.getenv("RAKUTEN_AFFILIATE_ID")
 # APIの接続先
 url = "https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20260701"
 
+
 # 検索用の関数
 def search_rakuten(keyword, limit=5, sort="price_asc", min_price=None, max_price=None):
     """楽天の商品を既存の共通形式に変換して返す。"""
     if not application_id or not access_key:
         # APIキーが取得できていないときの処理
         raise ValueError("楽天のAPIキーが未設定です。")
-    
+
     # 1回のAPI通信で取得する件数
     hits = min(limit, 30)
     # 楽天APIの取得ページ

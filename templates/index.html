@@ -1,3 +1,20 @@
+{%- macro page_url(target_page) -%}
+  {{- url_for(
+    'index',
+    keyword=keyword,
+    sites=selected,
+    limit=limit,
+    sort=sort,
+    min_price=min_price_text,
+    max_price=max_price_text,
+    exclude_keywords=exclude_keywords_text,
+    search_mode=search_mode,
+    display_mode=display_mode,
+    result_site=result_site,
+    search_id=search_id,
+    page=target_page
+  ) -}}
+{%- endmacro -%}
 <!doctype html>
 <!--日本語指定-->
 <html lang="ja">
@@ -193,25 +210,7 @@
                 id="display_mode"
                 name="display_mode"
                 {% if search_id %}
-                  onchange="
-                    const displayParams =
-                      new URLSearchParams(window.location.search);
-
-                    displayParams.set(
-                      'search_id',
-                      '{{ search_id }}'
-                    );
-
-                    displayParams.set(
-                      'display_mode',
-                      this.value
-                    );
-
-                    displayParams.set('page', '1');
-
-                    window.location.search =
-                      displayParams.toString();
-                  "
+                  onchange="updateResultParameter('display_mode', this.value, '{{ search_id }}')"
                 {% endif %}
               >
                 {% for value, label in display_modes.items() %}
@@ -239,25 +238,7 @@
                 {% if display_mode == "same_product" %}
                   disabled
                 {% elif search_id %}
-                  onchange="
-                    const sortParams =
-                      new URLSearchParams(window.location.search);
-
-                    sortParams.set(
-                      'search_id',
-                      '{{ search_id }}'
-                    );
-
-                    sortParams.set(
-                      'sort',
-                      this.value
-                    );
-
-                    sortParams.set('page', '1');
-
-                    window.location.search =
-                      sortParams.toString();
-                  "
+                  onchange="updateResultParameter('sort', this.value, '{{ search_id }}')"
                 {% endif %}
               >
 
@@ -307,7 +288,6 @@
             </div>
 
 
-            <!-- 表示件数 -->
 
 
           </div>
@@ -540,17 +520,7 @@
                 name="limit"
                 form="search-form"
                 {% if search_id %}
-                  onchange="
-                    const params =
-                      new URLSearchParams(window.location.search);
-
-                    params.set('search_id', '{{ search_id }}');
-                    params.set('limit', this.value);
-                    params.set('page', '1');
-
-                    window.location.search =
-                      params.toString();
-                  "
+                  onchange="updateResultParameter('limit', this.value, '{{ search_id }}')"
                 {% endif %}
               >
 
@@ -577,12 +547,7 @@
 
           <select
             id="result_site"
-            onchange="
-              const siteParams = new URLSearchParams(window.location.search);
-              siteParams.set('result_site', this.value);
-              siteParams.set('page', '1');
-              window.location.search = siteParams.toString();
-            "
+            onchange="updateResultParameter('result_site', this.value)"
           >
             <option value="all" {% if result_site == "all" %}selected{% endif %}>
               すべて
@@ -1109,13 +1074,10 @@
                         </p>
 
                       </div>
-                      <!-- ↑ compare-bottom-row を閉じる -->
 
                       </div>
-                      <!-- ↑ same-product-item を閉じる -->
 
                       </div>
-                      <!-- ↑ same-product-wrapper を閉じる -->
 
                       {% endfor %}
                   </div>
@@ -1135,21 +1097,7 @@
             <nav class="pagination">
 
               {% if page > 1 %}
-                <a class="page-arrow" href="{{ url_for(
-                  'index',
-                  keyword=keyword,
-                  sites=selected,
-                  limit=limit,
-                  sort=sort,
-                  min_price=min_price_text,
-                  max_price=max_price_text,
-                  exclude_keywords=exclude_keywords_text,
-                  search_mode=search_mode,
-                  display_mode=display_mode,
-                  result_site=result_site,
-                  search_id=search_id,
-                  page=page - 1
-                ) }}">&lt;</a>
+                <a class="page-arrow" href="{{ page_url(page - 1) }}">&lt;</a>
               {% endif %}
 
               <!-- ページ番号 -->
@@ -1195,21 +1143,7 @@
 
                   {% else %}
 
-                    <a href="{{ url_for(
-                      'index',
-                      keyword=keyword,
-                      sites=selected,
-                      limit=limit,
-                      sort=sort,
-                      min_price=min_price_text,
-                      max_price=max_price_text,
-                      exclude_keywords=exclude_keywords_text,
-                      search_mode=search_mode,
-                      display_mode=display_mode,
-                      result_site=result_site,
-                      search_id=search_id,
-                      page=p
-                    ) }}">{{ p }}</a>
+                    <a href="{{ page_url(p) }}">{{ p }}</a>
 
                   {% endif %}
 
@@ -1226,21 +1160,7 @@
               {% endfor %}
 
               {% if page < total_pages %}
-                <a class="page-arrow" href="{{ url_for(
-                  'index',
-                  keyword=keyword,
-                  sites=selected,
-                  limit=limit,
-                  sort=sort,
-                  min_price=min_price_text,
-                  max_price=max_price_text,
-                  exclude_keywords=exclude_keywords_text,
-                  search_mode=search_mode,
-                  display_mode=display_mode,
-                  result_site=result_site,
-                  search_id=search_id,
-                  page=page + 1
-                ) }}">&gt;</a>
+                <a class="page-arrow" href="{{ page_url(page + 1) }}">&gt;</a>
               {% endif %}
 
             </nav>
@@ -1447,6 +1367,17 @@
     </main>
     <!-- サイドバー内用 -->
     <script>
+      // 表示設定を変更したら、他の検索条件を残して1ページ目へ戻る。
+      function updateResultParameter(name, value, searchId) {
+        const params = new URLSearchParams(window.location.search);
+        if (searchId !== undefined) {
+          params.set("search_id", searchId);
+        }
+        params.set(name, value);
+        params.set("page", "1");
+        window.location.search = params.toString();
+      }
+
       const historyOpenButton = document.getElementById("history-open-button");
       const historyCloseButton = document.getElementById("history-close-button");
       const historySidebar = document.getElementById("history-sidebar");
@@ -1469,108 +1400,130 @@
       // 「すべて」チェックボックス
       const siteAllCheckbox = document.getElementById("site-all-checkbox");
       // 検索サイト選択タブ
-      const siteSelectDetails =document.querySelector(".site-select-details");
+      const siteSelectDetails = document.querySelector(".site-select-details");
 
       // 「すべて」を変更したら、全サイトを同じ状態にする
       siteAllCheckbox.addEventListener("change", function() {
+        siteCheckboxes.forEach(function(checkbox) {
+          checkbox.checked = siteAllCheckbox.checked;
+        });
 
-          siteCheckboxes.forEach(function(checkbox) {
-
-              checkbox.checked = siteAllCheckbox.checked;
-
-          });
-
-          // 上側の選択サイト表示も更新
-          updateSelectedSites();
+        // 上側の選択サイト表示も更新
+        updateSelectedSites();
       });
 
       // 選択中の検索サイトを上側に表示する
       function updateSelectedSites() {
+        selectedSitesArea.innerHTML = "";
 
-          selectedSitesArea.innerHTML = "";
+        siteCheckboxes.forEach(function(checkbox) {
+          // チェックされているサイトだけ表示
+          if (checkbox.checked) {
+            const siteName = document.createElement("span");
 
-          siteCheckboxes.forEach(function(checkbox) {
+            siteName.classList.add("selected-site");
 
-              // チェックされているサイトだけ表示
-              if (checkbox.checked) {
+            siteName.textContent = "・" + checkbox.dataset.siteName;
 
-                  const siteName = document.createElement("span");
-
-                  siteName.classList.add("selected-site");
-
-                  siteName.textContent =
-                      "・" + checkbox.dataset.siteName;
-
-                  selectedSitesArea.appendChild(siteName);
-              }
-          });
+            selectedSitesArea.appendChild(siteName);
+          }
+        });
       }
 
       // チェックを変更したら表示も更新する
       siteCheckboxes.forEach(function(checkbox) {
+        checkbox.addEventListener("change", function() {
+          // 選択中サイト表示を更新
+          updateSelectedSites();
 
-          checkbox.addEventListener("change", function() {
+          // 全サイトにチェックがあれば「すべて」もチェック
 
-              // 選択中サイト表示を更新
-              updateSelectedSites();
-
-              // 全サイトにチェックがあれば「すべて」もチェック
-              const allChecked =
-                  Array.from(siteCheckboxes).every(function(siteCheckbox) {
-                      return siteCheckbox.checked;
-                  });
-
-              siteAllCheckbox.checked = allChecked;
-
+          const allChecked = Array.from(siteCheckboxes).every(function(siteCheckbox) {
+            return siteCheckbox.checked;
           });
+
+          siteAllCheckbox.checked = allChecked;
+        });
       });
 
       // ページを開いた時の「すべて」の状態
-      siteAllCheckbox.checked =
-          Array.from(siteCheckboxes).every(function(checkbox) {
-              return checkbox.checked;
-          });
+
+      siteAllCheckbox.checked = Array.from(siteCheckboxes).every(function(checkbox) {
+        return checkbox.checked;
+      });
 
       // 保存済みの気になるを確認してボタン表示を変更
       function updateFavoriteButtons() {
+        const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
 
-          const favorites =
-              JSON.parse(localStorage.getItem("favorites")) || [];
-
-          favoriteButtons.forEach(function(button) {
-
-              // この商品が気になるに入っているか確認
-              const isFavorite = favorites.some(function(item) {
-                  return item.url === button.dataset.url;
-              });
-
-              // 登録済みなら⭐、未登録なら☆
-              if (isFavorite) {
-
-                  button.textContent = "⭐気になる";
-                  button.setAttribute(
-                      "aria-label",
-                      "気になるから削除"
-                  );
-                  button.title = "気になるから削除";
-
-              } else {
-
-                  button.textContent = "☆気になる";
-                  button.setAttribute(
-                      "aria-label",
-                      "気になるに追加"
-                  );
-                  button.title = "気になるに追加";
-
-              }
-
+        favoriteButtons.forEach(function(button) {
+          // この商品が気になるに入っているか確認
+          const isFavorite = favorites.some(function(item) {
+            return item.url === button.dataset.url;
           });
 
+          // 登録済みなら⭐、未登録なら☆
+          if (isFavorite) {
+            button.textContent = "⭐気になる";
+            button.setAttribute(
+              "aria-label",
+              "気になるから削除"
+            );
+            button.title = "気になるから削除";
+          } else {
+            button.textContent = "☆気になる";
+            button.setAttribute(
+              "aria-label",
+              "気になるに追加"
+            );
+            button.title = "気になるに追加";
+          }
+        });
       }
 
       // ページを開いた時に気になる状態を反映
       updateFavoriteButtons();
+
+      // 履歴と気になる一覧で共通の商品表示。
+      function createSidebarItem(product) {
+        const item = document.createElement("div");
+        item.classList.add("history-item");
+
+        const image = document.createElement("img");
+        image.src = product.image;
+        image.alt = product.name;
+        image.width = 80;
+        image.height = 80;
+
+        const name = document.createElement("p");
+        name.classList.add("history-title");
+        name.textContent = product.name;
+
+        const price = document.createElement("p");
+        price.textContent = "¥" + Number(product.price).toLocaleString();
+
+        const siteLink = document.createElement("a");
+        siteLink.textContent = product.site + "へ";
+        siteLink.href = product.url;
+        siteLink.target = "_blank";
+        siteLink.rel = "noopener noreferrer";
+
+        const meta = document.createElement("div");
+        meta.classList.add("history-meta");
+
+        const info = document.createElement("div");
+        info.classList.add("history-info");
+
+        meta.appendChild(price);
+        meta.appendChild(siteLink);
+
+        info.appendChild(name);
+        info.appendChild(meta);
+
+        item.appendChild(image);
+        item.appendChild(info);
+        return { item, meta };
+      }
 
       function displayHistory() {
         const history = JSON.parse(localStorage.getItem("viewHistory")) || [];
@@ -1582,56 +1535,18 @@
         historyList.innerHTML = "";
 
         history.forEach(function(product) {
-          const item = document.createElement("div");
-          item.classList.add("history-item");
-
-          const image = document.createElement("img");
-          image.src = product.image;
-          image.alt = product.name;
-          image.width = 80;
-          image.height = 80;
-
-          const name = document.createElement("p");
-          name.classList.add("history-title");
-          name.textContent = product.name;
-
-          const price = document.createElement("p");
-          price.textContent = "¥" + Number(product.price).toLocaleString();
-
-          const siteLink = document.createElement("a");
-          siteLink.textContent = product.site + "へ";
-          siteLink.href = product.url;
-          siteLink.target = "_blank";
-          siteLink.rel = "noopener noreferrer";
-
-          const meta = document.createElement("div");
-          meta.classList.add("history-meta");
-
-          const info = document.createElement("div");
-          info.classList.add("history-info");
-
-          meta.appendChild(price);
-          meta.appendChild(siteLink);
-
-          info.appendChild(name);
-          info.appendChild(meta);
-
-          item.appendChild(image);
-          item.appendChild(info);
-
+          const { item } = createSidebarItem(product);
           historyList.appendChild(item);
         });
       }
 
       // 気になる一覧を表示
       function displayFavorites() {
-        const favorites =
-          JSON.parse(localStorage.getItem("favorites")) || [];
+        const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
 
         // 気になるがない場合
         if (favorites.length === 0) {
-          favoriteList.innerHTML =
-            "<p>まだ気になる商品はありません。</p>";
+          favoriteList.innerHTML = "<p>まだ気になる商品はありません。</p>";
           return;
         }
 
@@ -1639,32 +1554,7 @@
         favoriteList.innerHTML = "";
 
         favorites.forEach(function(product) {
-          const item = document.createElement("div");
-          item.classList.add("history-item");
-
-          // 商品画像
-          const image = document.createElement("img");
-          image.src = product.image;
-          image.alt = product.name;
-          image.width = 80;
-          image.height = 80;
-
-          // 商品名
-          const name = document.createElement("p");
-          name.classList.add("history-title");
-          name.textContent = product.name;
-
-          // 価格
-          const price = document.createElement("p");
-          price.textContent =
-            "¥" + Number(product.price).toLocaleString();
-
-          // 商品サイトへのリンク
-          const siteLink = document.createElement("a");
-          siteLink.textContent = product.site + "へ";
-          siteLink.href = product.url;
-          siteLink.target = "_blank";
-          siteLink.rel = "noopener noreferrer";
+          const { item, meta } = createSidebarItem(product);
 
           // 気になる削除ボタン
           const deleteButton = document.createElement("button");
@@ -1674,8 +1564,7 @@
 
           // 削除ボタンを押した商品を気になるから削除
           deleteButton.addEventListener("click", function() {
-            let favorites =
-              JSON.parse(localStorage.getItem("favorites")) || [];
+            let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
 
             // 押した商品と同じURLの商品を除外
             favorites = favorites.filter(function(item) {
@@ -1692,21 +1581,7 @@
             updateFavoriteButtons();
           });
 
-          const meta = document.createElement("div");
-          meta.classList.add("history-meta");
-
-          const info = document.createElement("div");
-          info.classList.add("history-info");
-
-          meta.appendChild(price);
-          meta.appendChild(siteLink);
           meta.appendChild(deleteButton);
-
-          info.appendChild(name);
-          info.appendChild(meta);
-
-          item.appendChild(image);
-          item.appendChild(info);
 
           favoriteList.appendChild(item);
         });
@@ -1741,7 +1616,6 @@
       // 気になるボタンをクリックした時の処理
       favoriteButtons.forEach(function(button) {
         button.addEventListener("click", function() {
-
           // ボタンが持っている商品情報を取得
           const product = {
             name: button.dataset.name,
@@ -1763,10 +1637,9 @@
           });
 
           if (isFavorite) {
-
             // 登録済みなら気になるから削除
             favorites = favorites.filter(function(item) {
-                return item.url !== product.url;
+              return item.url !== product.url;
             });
 
             button.textContent = "☆ 気になる";
@@ -1774,9 +1647,7 @@
 
             // 未登録になったので説明を消す
             button.removeAttribute("title");
-
-        } else {
-
+          } else {
             // 未登録なら気になるに追加
             favorites.unshift(product);
 
@@ -1788,10 +1659,10 @@
 
             // ⭐にカーソルを置いた時だけ表示
             button.title = "気になるから削除";
-        }
+          }
 
           // 気になるを保存
-        localStorage.setItem("favorites", JSON.stringify(favorites));
+          localStorage.setItem("favorites", JSON.stringify(favorites));
         });
       });
 
@@ -1815,7 +1686,6 @@
 
       // 気になるをすべて削除
       favoriteClearButton.addEventListener("click", function() {
-
         // 保存している気になるを削除
         localStorage.removeItem("favorites");
 
@@ -1839,44 +1709,35 @@
 
       // 検索サイト選択タブの外側をクリックしたら閉じる
       document.addEventListener("click", function(event) {
+        // タブの中をクリックした場合は閉じない
+        if (siteSelectDetails.contains(event.target)) {
+          return;
+        }
 
-          // タブの中をクリックした場合は閉じない
-          if (siteSelectDetails.contains(event.target)) {
-              return;
-          }
-
-          // タブの外側なら閉じる
-          siteSelectDetails.removeAttribute("open");
+        // タブの外側なら閉じる
+        siteSelectDetails.removeAttribute("open");
       });
 
       // 絞り込みフォーム
       const filterForm = document.getElementById("filter-form");
 
       // スマホ用の絞り込みタブ
-      const mobileFilterToggle =
-          document.getElementById("mobile-filter-toggle");
 
-      const filterSidebar =
-          document.querySelector(".filter-sidebar");
+      const mobileFilterToggle = document.getElementById("mobile-filter-toggle");
 
-
+      const filterSidebar = document.querySelector(".filter-sidebar");
 
       if (mobileFilterToggle && filterSidebar) {
-          mobileFilterToggle.addEventListener("click", function() {
+        mobileFilterToggle.addEventListener("click", function() {
+          const isOpen = filterSidebar.classList.toggle("mobile-open");
 
-              const isOpen =
-                  filterSidebar.classList.toggle("mobile-open");
+          mobileFilterToggle.textContent = isOpen ? "絞り込み ▲" : "絞り込み ▼";
 
-              mobileFilterToggle.textContent =
-                  isOpen ? "絞り込み ▲" : "絞り込み ▼";
-
-              mobileFilterToggle.setAttribute(
-                  "aria-expanded",
-                  isOpen
-              );
-
-
-          });
+          mobileFilterToggle.setAttribute(
+            "aria-expanded",
+            isOpen
+          );
+        });
       }
 
       // =========================
@@ -1885,21 +1746,19 @@
       // =========================
 
       if (mobileFilterToggle && filterSidebar) {
-
         // 現在のURLパラメータを取得
         const filterParams = new URLSearchParams(window.location.search);
 
         // 絞り込み条件が1つでも入っているか確認
-        const hasActiveFilter =
-          filterParams.get("exclude_keywords") ||
-          filterParams.get("min_price") ||
-          filterParams.get("max_price") ||
-          filterParams.get("postage_only") === "1" ||
-          filterParams.get("point_up_only") === "1";
+
+        const hasActiveFilter = filterParams.get("exclude_keywords") ||
+        filterParams.get("min_price") ||
+        filterParams.get("max_price") ||
+        filterParams.get("postage_only") === "1" ||
+        filterParams.get("point_up_only") === "1";
 
         // スマホで絞り込み中なら開いた状態にする
         if (window.innerWidth <= 900 && hasActiveFilter) {
-
           filterSidebar.classList.add("mobile-open");
 
           mobileFilterToggle.textContent = "絞り込み ▲";
@@ -1913,304 +1772,258 @@
 
       // 絞り込み欄ではEnterキーで送信しない
       filterForm.addEventListener("keydown", function(event) {
-
-          if (
-              event.key === "Enter" &&
-              event.target.tagName === "INPUT"
-          ) {
-              event.preventDefault();
-          }
-
+        if (
+          event.key === "Enter" &&
+          event.target.tagName === "INPUT"
+        ) {
+          event.preventDefault();
+        }
       });
 
       // 価格の桁数に合わせて入力欄の幅を変更
-      const priceInputs =
-          document.querySelectorAll(".price-input-wrap input");
+
+      const priceInputs = document.querySelectorAll(".price-input-wrap input");
 
       // 最低価格・最高価格を取得
       const minPriceInput = document.getElementById("min_price");
       const maxPriceInput = document.getElementById("max_price");
 
-
       // 数字を「¥5,000」の形にする
       function formatPrice(input) {
+        // ¥ とカンマを取り除く
+        const rawValue = input.value.replace(/[¥￥,]/g, "");
 
-          // ¥ とカンマを取り除く
-          const rawValue = input.value.replace(/[¥￥,]/g, "");
+        // 数字以外なら何もしない
+        if (rawValue === "" || isNaN(rawValue)) {
+          return;
+        }
 
-          // 数字以外なら何もしない
-          if (rawValue === "" || isNaN(rawValue)) {
-              return;
-          }
-
-          // ¥ + 3桁ごとのカンマ
-          input.value = "¥" + Number(rawValue).toLocaleString("ja-JP");
+        // ¥ + 3桁ごとのカンマ
+        input.value = "¥" + Number(rawValue).toLocaleString("ja-JP");
       }
-
 
       // 入力欄をクリックしたら編集しやすい数字だけに戻す
       function unformatPrice(input) {
-
-          input.value = input.value.replace(/[¥￥,]/g, "");
+        input.value = input.value.replace(/[¥￥,]/g, "");
       }
-
 
       // 最低価格でEnterを押したら最高価格へ移動
       minPriceInput.addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
 
-          if (event.key === "Enter") {
+          // 最低価格を表示用に整える
+          formatPrice(minPriceInput);
 
-              event.preventDefault();
-
-              // 最低価格を表示用に整える
-              formatPrice(minPriceInput);
-
-              // 最高価格へ移動
-              maxPriceInput.focus();
-          }
-
+          // 最高価格へ移動
+          maxPriceInput.focus();
+        }
       });
 
       // 最高価格でEnterを押したら入力を確定
       maxPriceInput.addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+          // Enterでフォームが送信されるのを防ぐ
+          event.preventDefault();
 
-          if (event.key === "Enter") {
-
-              // Enterでフォームが送信されるのを防ぐ
-              event.preventDefault();
-
-              // ¥100,000 の形に整える
-              formatPrice(maxPriceInput);
-
-              // 入力欄からフォーカスを外して確定
-              maxPriceInput.blur();
-          }
-
-      });
-
-      // フォーカスしたら数字だけにする
-      minPriceInput.addEventListener("focus", function() {
-          unformatPrice(minPriceInput);
-      });
-
-      maxPriceInput.addEventListener("focus", function() {
-          unformatPrice(maxPriceInput);
-      });
-
-
-      // 入力欄から離れたら ¥5,000 の形にする
-      minPriceInput.addEventListener("blur", function() {
-          formatPrice(minPriceInput);
-      });
-
-      maxPriceInput.addEventListener("blur", function() {
+          // ¥100,000 の形に整える
           formatPrice(maxPriceInput);
+
+          // 入力欄からフォーカスを外して確定
+          maxPriceInput.blur();
+        }
       });
 
+      // 最低価格・最高価格に同じ表示切り替えを設定する。
+      [minPriceInput, maxPriceInput].forEach(function(input) {
+        input.addEventListener("focus", function() {
+          unformatPrice(input);
+        });
+        input.addEventListener("blur", function() {
+          formatPrice(input);
+        });
+      });
 
       // 絞り込むボタンを押す直前に、送信用の数字だけに戻す
       filterForm.addEventListener("submit", function() {
-
-          unformatPrice(minPriceInput);
-          unformatPrice(maxPriceInput);
-
+        unformatPrice(minPriceInput);
+        unformatPrice(maxPriceInput);
       });
 
       // 入力した桁数に合わせて数字部分だけ横幅を変更
       function updatePriceInputWidth(input) {
+        const length = Math.max(input.value.length, 4);
 
-          const length = Math.max(input.value.length, 4);
-
-          input.style.width = `calc(${length}ch + 4px)`;
+        input.style.width = `calc(${length}ch + 4px)`;
       }
 
       // ページを開いた時と、数字を入力した時に幅を調整
       priceInputs.forEach(function(input) {
+        // 最初の表示時
+        updatePriceInputWidth(input);
 
-          // 最初の表示時
+        // 入力するたびに更新
+        input.addEventListener("input", function() {
           updatePriceInputWidth(input);
-
-          // 入力するたびに更新
-          input.addEventListener("input", function() {
-              updatePriceInputWidth(input);
-          });
-
+        });
       });
-
 
       // サイドバーを背景クリックで閉じる
       historyOverlay.addEventListener("click", function() {
         // 閲覧履歴を閉じる
         historySidebar.classList.remove("open");
-         // 気になるサイドバーも閉じる
+        // 気になるサイドバーも閉じる
         favoriteSidebar.classList.remove("open");
         historyOverlay.classList.remove("open");
       });
-    
-    // スマホの商品一覧で、長い価格だけ文字を小さくする
-    function adjustMobilePriceSize() {
 
-      // PCでは何もしない
-      if (window.innerWidth > 900) {
-        return;
-      }
-
-      // 商品一覧の価格をすべて取得
-      const prices = document.querySelectorAll(
-        ".table-wrap tbody td:nth-child(3) .compare-price"
-      );
-
-      prices.forEach(function(price) {
-
-        // まず通常サイズに戻す
-        let fontSize = 26;
-        price.style.fontSize = fontSize + "px";
-
-        // 最小18pxまで、枠に収まるまで少しずつ縮める
-        while (
-          price.scrollWidth > price.clientWidth &&
-          fontSize > 18
-        ) {
-          fontSize -= 1;
-          price.style.fontSize = fontSize + "px";
-        }
-
-      });
-    }
-    // ページを開いた時に調整
-    adjustMobilePriceSize();
-
-    // 画面サイズが変わった時も再調整
-    window.addEventListener("resize", adjustMobilePriceSize);
-
-    // 商品検索欄で入力した文字を確定したら検索する
-    const keywordInput = document.getElementById("keyword");
-    const searchForm = document.getElementById("search-form");
-
-    let keywordBeforeEdit = "";
-
-    // キーボードの検索ボタンから送信したか判定する
-    let isKeyboardSearch = false;
-
-
-    // 入力を始める前の商品名を覚えておく
-    keywordInput.addEventListener("focus", function() {
-      keywordBeforeEdit = keywordInput.value;
-      isKeyboardSearch = false;
-    });
-
-
-    // Enter / キーボードの検索ボタンを押した時
-    keywordInput.addEventListener("keydown", function(event) {
-
-      // 日本語変換中のEnterでは検索しない
-      if (event.key === "Enter" && !event.isComposing) {
-        event.preventDefault();
-
-        // 空欄なら検索しない
-        if (keywordInput.value.trim() === "") {
+      // スマホの商品一覧で、長い価格だけ文字を小さくする
+      function adjustMobilePriceSize() {
+        // PCでは何もしない
+        if (window.innerWidth > 900) {
           return;
         }
 
-        // blur側で二重送信しないための印
-        isKeyboardSearch = true;
+        // 商品一覧の価格をすべて取得
+        const prices = document.querySelectorAll(
+          ".table-wrap tbody td:nth-child(3) .compare-price"
+        );
 
-        // 先にキーボードを閉じる
+        prices.forEach(function(price) {
+          // まず通常サイズに戻す
+          let fontSize = 26;
+          price.style.fontSize = fontSize + "px";
+
+          // 最小18pxまで、枠に収まるまで少しずつ縮める
+          while (
+            price.scrollWidth > price.clientWidth &&
+            fontSize > 18
+          ) {
+            fontSize -= 1;
+            price.style.fontSize = fontSize + "px";
+          }
+        });
+      }
+      // ページを開いた時に調整
+      adjustMobilePriceSize();
+
+      // 画面サイズが変わった時も再調整
+      window.addEventListener("resize", adjustMobilePriceSize);
+
+      // 商品検索欄で入力した文字を確定したら検索する
+      const keywordInput = document.getElementById("keyword");
+      const searchForm = document.getElementById("search-form");
+
+      let keywordBeforeEdit = "";
+
+      // キーボードの検索ボタンから送信したか判定する
+      let isKeyboardSearch = false;
+
+      // 入力を始める前の商品名を覚えておく
+      keywordInput.addEventListener("focus", function() {
+        keywordBeforeEdit = keywordInput.value;
+        isKeyboardSearch = false;
+      });
+
+      // Enter / キーボードの検索ボタンを押した時
+      keywordInput.addEventListener("keydown", function(event) {
+        // 日本語変換中のEnterでは検索しない
+        if (event.key === "Enter" && !event.isComposing) {
+          event.preventDefault();
+
+          // 空欄なら検索しない
+          if (keywordInput.value.trim() === "") {
+            return;
+          }
+
+          // blur側で二重送信しないための印
+          isKeyboardSearch = true;
+
+          // 先にキーボードを閉じる
+          keywordInput.blur();
+
+          // キーボードが閉じる時間を少しだけ確保してから検索
+          setTimeout(function() {
+            searchForm.requestSubmit();
+            }, 50);
+        }
+      });
+
+      // 入力欄の外をタップして閉じた時
+      keywordInput.addEventListener("blur", function() {
+        // キーボードの検索ボタンで閉じた場合は、
+        // keydown側で検索するのでここでは何もしない
+        if (isKeyboardSearch) {
+          isKeyboardSearch = false;
+          return;
+        }
+
+        // PCでは、検索欄の外をクリックしただけでは検索しない
+        if (window.innerWidth > 900) {
+          return;
+        }
+
+        const keywordAfterEdit = keywordInput.value.trim();
+
+        // スマホでは商品名を実際に変更した時だけ検索する
+        if (
+          keywordAfterEdit !== "" &&
+          keywordAfterEdit !== keywordBeforeEdit.trim()
+        ) {
+          searchForm.requestSubmit();
+        }
+      });
+
+      // =========================
+      // 検索中ローディング画面
+      // =========================
+
+      const searchLoading = document.getElementById("search-loading");
+
+      let isSearchSubmitting = false;
+
+      // 商品検索フォームが送信された時
+      searchForm.addEventListener("submit", function(event) {
+        // 二重送信を防ぐ
+        if (isSearchSubmitting) {
+          event.preventDefault();
+          return;
+        }
+
+        // HTMLのrequiredなどに引っかかっている場合は送信しない
+        if (!searchForm.checkValidity()) {
+          return;
+        }
+
+        // いったん通常の送信を止める
+        event.preventDefault();
+
+        isSearchSubmitting = true;
+
+        // スマホのキーボードを閉じる
         keywordInput.blur();
 
-        // キーボードが閉じる時間を少しだけ確保してから検索
+        // ローディング画面を表示
+        searchLoading.classList.add("show");
+
+        // 検索中は後ろの画面をスクロールさせない
+        document.body.style.overflow = "hidden";
+
+        // ローディング画面を描画してから検索を開始
         setTimeout(function() {
-          searchForm.requestSubmit();
-        }, 50);
-      }
-    });
+          // submitイベントをもう一度発生させずにフォーム送信
+          HTMLFormElement.prototype.submit.call(searchForm);
+          }, 80);
+      });
 
+      // 戻るボタンなどでページに戻った時はローディングを解除
+      window.addEventListener("pageshow", function() {
+        isSearchSubmitting = false;
 
-    // 入力欄の外をタップして閉じた時
-    keywordInput.addEventListener("blur", function() {
+        searchLoading.classList.remove("show");
 
-      // キーボードの検索ボタンで閉じた場合は、
-      // keydown側で検索するのでここでは何もしない
-      if (isKeyboardSearch) {
-        isKeyboardSearch = false;
-        return;
-      }
-
-      // PCでは、検索欄の外をクリックしただけでは検索しない
-      if (window.innerWidth > 900) {
-        return;
-      }
-
-      const keywordAfterEdit = keywordInput.value.trim();
-
-      // スマホでは商品名を実際に変更した時だけ検索する
-      if (
-        keywordAfterEdit !== "" &&
-        keywordAfterEdit !== keywordBeforeEdit.trim()
-      ) {
-        searchForm.requestSubmit();
-      }
-    });
-
-    // =========================
-    // 検索中ローディング画面
-    // =========================
-
-    const searchLoading = document.getElementById("search-loading");
-
-    let isSearchSubmitting = false;
-
-
-    // 商品検索フォームが送信された時
-    searchForm.addEventListener("submit", function(event) {
-
-      // 二重送信を防ぐ
-      if (isSearchSubmitting) {
-        event.preventDefault();
-        return;
-      }
-
-      // HTMLのrequiredなどに引っかかっている場合は送信しない
-      if (!searchForm.checkValidity()) {
-        return;
-      }
-
-      // いったん通常の送信を止める
-      event.preventDefault();
-
-      isSearchSubmitting = true;
-
-      // スマホのキーボードを閉じる
-      keywordInput.blur();
-
-      // ローディング画面を表示
-      searchLoading.classList.add("show");
-
-      // 検索中は後ろの画面をスクロールさせない
-      document.body.style.overflow = "hidden";
-
-
-      // ローディング画面を描画してから検索を開始
-      setTimeout(function() {
-
-        // submitイベントをもう一度発生させずにフォーム送信
-        HTMLFormElement.prototype.submit.call(searchForm);
-
-      }, 80);
-
-    });
-
-
-    // 戻るボタンなどでページに戻った時はローディングを解除
-    window.addEventListener("pageshow", function() {
-
-      isSearchSubmitting = false;
-
-      searchLoading.classList.remove("show");
-
-      document.body.style.overflow = "";
-
-    });
+        document.body.style.overflow = "";
+      });
     </script>
   </body>
 </html>

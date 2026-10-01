@@ -8,20 +8,21 @@ from api.google_shopping import search_serp
 SITES = {
     "rakuten": {
         "name": "楽天市場",
-        "search": search_rakuten, 
+        "search": search_rakuten,
         "max_limit": 100,
-        },
+    },
     "yahoo": {
         "name": "Yahoo!ショッピング",
         "search": search_yahoo,
         "max_limit": 100,
-        },
+    },
     "serp": {
         "name": "Google Shopping",
         "search": search_serp,
         "max_limit": 40,
-        },
+    },
 }
+
 
 # 評価とレビュー件数からおすすめスコアを計算
 def calculate_recommend_score(product):
@@ -38,6 +39,7 @@ def calculate_recommend_score(product):
         + confidence_count / (review_count + confidence_count) * base_rating
     )
     return score
+
 
 # app.pyから渡された情報の受け取り
 def search_products(
@@ -58,7 +60,6 @@ def search_products(
     else:
         api_sort = sort
     # 除外キーワードを空白ごとに分ける
-    # .split()は、空白を基準に文字列を分割する
     exclude_keywords = exclude_keywords_text.lower().split()
     # 検索キーワードを空白ごとに分ける
     search_keywords = keyword.lower().split()
@@ -71,9 +72,13 @@ def search_products(
             # サイトごとの上限を決める
             site_limit = min(fetch_limit, site["max_limit"])
             # API検索
-            results = site["search"](keyword, 
-            limit=site_limit, sort=api_sort,min_price=min_price,
-            max_price=max_price,)
+            results = site["search"](
+                keyword,
+                limit=site_limit,
+                sort=api_sort,
+                min_price=min_price,
+                max_price=max_price,
+            )
             # APIの検索結果にサイト名を追加して表示
             # 取得した商品を1件ずつ確認
             for product in results:
@@ -94,7 +99,7 @@ def search_products(
                     continue
                 # 条件を通った商品だけ追加
                 products.append({**product, "site": site["name"]})
-            # APIへの通信失敗等でもアプリが停止しない処理
+        # APIへの通信失敗等でもアプリが停止しない処理
         except (requests.RequestException, ValueError, KeyError, TypeError) as e:
             print(f"{site['name']} エラー:", repr(e))
 
