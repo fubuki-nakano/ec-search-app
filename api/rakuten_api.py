@@ -27,7 +27,6 @@ def search_rakuten(keyword, limit=5, sort="price_asc", min_price=None, max_price
     # APIに送る条件表
     params = {
         "applicationId": application_id,
-        "accessKey": access_key,
         "keyword": keyword,
         "format": "json",
         "hits": hits,
@@ -59,8 +58,13 @@ def search_rakuten(keyword, limit=5, sort="price_asc", min_price=None, max_price
     while len(rakuten_results) < limit:
         # 今回取得するページ番号を指定
         params["page"] = page
-        # 楽天APIへ問い合わせ
-        response = requests.get(url, params=params, timeout=15)
+        # Access KeyはURLではなくHTTPヘッダーで送る
+        response = requests.get(
+            url,
+            params=params,
+            headers={"accessKey": access_key},
+            timeout=15,
+        )
         # エラーが返ってきたら例外にする
         response.raise_for_status()
         # 楽天から返ってきたJSONをPythonで扱える形に変換
